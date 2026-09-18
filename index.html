@@ -1232,6 +1232,8 @@ body {
                             </button>
                         </div>
                     </div>
+                </div>
+
                 <!-- Shift Management Card (إدارة الشفتات وساعات العمل) -->
                 <div class="glass-card p-5 md:col-span-2">
                     <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
@@ -1839,6 +1841,9 @@ body {
                     إغلاق
                 </button>
             </div>
+        </div>
+    </div>
+
     <!-- Modal 12: Add / Edit Shift (إدارة الشفت) -->
     <div id="shiftModal" class="modal-backdrop">
         <div class="modal-content p-6 max-w-md">
@@ -2168,7 +2173,7 @@ body {
 
 const STORAGE_KEY = 'MODERATOR_SYSTEM_DATA_V2';
 
-// البيانات الأولية (تبدأ فارغة تماماً من أي بيانات وهمية — يتم تعبئتها من لوحة التحكم)
+// البيانات الأولية (تحتوي على بيانات وهمية تجريبية — يمكن تعديلها من لوحة التحكم)
 const initialData = {
     settings: {
         companyName: 'وكالة التسويق وإدارة المنصات',
@@ -2184,10 +2189,10 @@ const initialData = {
         ]
     },
 
-    // قائمة الصفحات والمنصات (تبدأ فارغة — أضف صفحاتك الحقيقية من لوحة التحكم)
+    // قائمة الصفحات والمنصات (سجّلها من لوحة التحكم)
     pages: [],
 
-    // قائمة المودريتورز (تبدأ فارغة — أضف مودريتورز فريقك الحقيقيين من لوحة التحكم)
+    // قائمة المودريتورز (سجّلهم من لوحة التحكم)
     moderators: [],
 
     // سجل الحضور والانصراف
@@ -2358,8 +2363,8 @@ class DataStore {
                 if (!loaded.settings.adminUsername) loaded.settings.adminUsername = 'admin';
                 if (!loaded.settings.adminPassword) loaded.settings.adminPassword = 'admin123';
 
-                // إذا كانت البيانات المحفوظة لا تحتوي على مصفوفة صفحات أو مودريتورز صالحة،
-                // يتم الرجوع للقيم الافتراضية الفارغة في initialData
+                // إذا كانت البيانات المحفوظة لا تحتوي على صفحات أو مودريتورز حقيقيين،
+                // نستخدم البيانات الوهمية التجريبية من initialData تلقائياً
                 if (!Array.isArray(parsed.pages) || parsed.pages.length === 0) {
                     loaded.pages = JSON.parse(JSON.stringify(initialData.pages));
                 }
