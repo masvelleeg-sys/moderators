@@ -1113,6 +1113,7 @@ body {
                                 </span>
                             </div>
                             <p class="text-xs text-indigo-200 mt-0.5">تتيح مزامنة تسجيلات الحضور والأداء لحظياً بين كافة هواتف المودريتورز وحاسوب الإدارة عبر الإنترنت فورياً.</p>
+                            <p id="cloudErrorDetail" class="text-2xs text-rose-300 mt-1 hidden"></p>
                         </div>
                     </div>
                     <button onclick="showFirebaseSetupGuide()" class="px-3.5 py-1.5 bg-indigo-600/60 hover:bg-indigo-600 border border-indigo-400/40 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0">
@@ -5927,21 +5928,40 @@ window.confirmDeleteShift = function(shiftId) {
     });
 };
 
-function updateCloudStatusBadge() {
+function updateCloudStatusBadge(errorMsg) {
     const badge = document.getElementById('cloudStatusBadge');
+    const errEl = document.getElementById('cloudErrorDetail');
     if (!badge) return;
 
     if (DB.isCloudActive()) {
         badge.className = 'px-2.5 py-0.5 bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-2xs font-bold rounded-full flex items-center gap-1';
         badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span>متصل بالسحابة اللحظية (Cloud Active)</span>';
+        if (errEl) errEl.classList.add('hidden');
     } else {
         badge.className = 'px-2.5 py-0.5 bg-slate-800 border border-slate-700 text-slate-300 text-2xs font-bold rounded-full flex items-center gap-1';
         badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> <span>وضع التخزين المحلي (Local Mode)</span>';
+
+        if (errEl && errorMsg) {
+            let friendly = errorMsg;
+            if (errorMsg.includes('unauthorized-domain')) {
+                friendly = '⚠️ الدومين اللي شغال عليه النظام مش مضاف في Firebase. روح Authentication → Settings → Authorized domains → Add domain، وضيف دومين الموقع بتاعك.';
+            } else if (errorMsg.includes('permission-denied') || errorMsg.includes('Permission denied')) {
+                friendly = '⚠️ قواعد الحماية (Rules) في Realtime Database رافضة الاتصال. تأكد إنك نشرت (Publish) القاعدة الصحيحة وإن Anonymous مفعّلة في Authentication.';
+            } else if (errorMsg.includes('operation-not-allowed')) {
+                friendly = '⚠️ تسجيل الدخول المجهول (Anonymous) مش مفعّل. روح Authentication → Sign-in method → فعّل Anonymous واحفظ.';
+            } else if (errorMsg.includes('network')) {
+                friendly = '⚠️ فيه مشكلة في الاتصال بالإنترنت أو رابط قاعدة البيانات غلط. تأكد من الرابط ومن اتصال الإنترنت.';
+            }
+            errEl.textContent = friendly;
+            errEl.classList.remove('hidden');
+        } else if (errEl) {
+            errEl.classList.add('hidden');
+        }
     }
 }
 
-window.addEventListener('cloud-status', () => {
-    updateCloudStatusBadge();
+window.addEventListener('cloud-status', (e) => {
+    updateCloudStatusBadge(e.detail && e.detail.error);
 });
 
 window.saveCloudConfig = function() {
