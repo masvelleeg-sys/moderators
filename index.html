@@ -2259,9 +2259,14 @@ const initialData = {
 
 const FIREBASE_CONFIG_KEY = 'MODERATOR_SYSTEM_FIREBASE_CONFIG';
 
-// لا يوجد إعداد افتراضي مشترك لقاعدة بيانات Firebase — كل نظام لازم يستخدم قاعدة بياناته
-// الخاصة فقط، لتجنب اشتراك أكثر من جهة في نفس قاعدة البيانات وتسريب بيانات الموظفين.
-const DEFAULT_FIREBASE_CONFIG = null;
+// إعداد Firebase الافتراضي الخاص بنظامك (مشروعك الشخصي على Firebase Console).
+// آمن لأنه بيتطلب تسجيل دخول مجهول (Anonymous Auth) + قواعد حماية "auth != null" —
+// أي حد يحاول يوصل من غير المرور بنظامك نفسه، الاتصال هيترفض تلقائيًا.
+// السبب في تفعيله هنا: بوابة المودريتور بتفتح على أجهزة الموظفين المختلفة، ومفيش
+// طريقة تانية توصلهم بنفس القاعدة غير إنه يبقى مكتوب هنا مرة واحدة للجميع.
+const DEFAULT_FIREBASE_CONFIG = {
+    databaseURL: 'https://moderators-syste-7d2e0-default-rtdb.europe-west1.firebasedatabase.app'
+};
 
 // فئة إدارة البيانات (DataStore Manager)
 class DataStore {
@@ -2286,8 +2291,9 @@ class DataStore {
         if (typeof window === 'undefined' || typeof firebase === 'undefined') return;
 
         try {
-            // لا يتم الاتصال بأي قاعدة بيانات سحابية إلا إذا قام المدير بإدخالها بنفسه
-            // من تبويب الإعدادات وحفظها صراحةً (لا يوجد اتصال تلقائي بإعداد افتراضي).
+            // لو المدير حفظ رابط مخصص بنفسه من الإعدادات، نستخدمه، وإلا نستخدم
+            // الإعداد الافتراضي (قاعدة بيانات هذا النظام نفسه) — محمي بتسجيل دخول
+            // مجهول (Anonymous Auth) وقواعد حماية "auth != null".
             let config = null;
             const savedConfig = localStorage.getItem(FIREBASE_CONFIG_KEY);
             if (savedConfig) {
