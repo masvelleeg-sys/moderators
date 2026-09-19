@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4f46e5">
     <title>نظام إدارة ومتابعة مودريتور السوشيال ميديا | Moderator OS</title>
     
     <!-- Google Fonts: Cairo -->
@@ -382,6 +383,134 @@ body {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.08); }
 }
+
+/* ==========================================================================
+   شارات ورقائق المنصات (Platform chips & badges)
+   ========================================================================== */
+.plat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.5rem 0.95rem;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.plat-chip:hover { border-color: #a5b4fc; }
+.plat-chip:active { transform: scale(0.96); }
+.plat-chip:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+.plat-chip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+.plat-chip.is-on .plat-chip-dot { display: none; }
+
+.plat-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.5;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   التأقلم مع شاشات الهواتف والأجهزة اللوحية (Mobile Responsive)
+   ========================================================================== */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; }
+img, canvas, svg, video { max-width: 100%; }
+button, select, summary { touch-action: manipulation; }
+
+/* شريط التبويبات: تمرير سلس بدون شريط تمرير ظاهر */
+.nav-tabs-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.nav-tabs-scroll::-webkit-scrollbar { display: none; }
+.nav-tab-btn { flex-shrink: 0; scroll-snap-align: center; }
+
+/* أجهزة لوحية وأصغر */
+@media (max-width: 1023px) {
+  .custom-table th { padding: 0.7rem 0.75rem; font-size: 0.8rem; white-space: nowrap; }
+  .custom-table td { padding: 0.75rem; }
+}
+
+/* هواتف */
+@media (max-width: 767px) {
+  /* منع تكبير iOS التلقائي عند التركيز على الحقول */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea { font-size: 16px !important; }
+
+  .nav-tabs-scroll { scroll-snap-type: x proximity; }
+  .nav-tab-btn { padding: 0.65rem 0.9rem; font-size: 0.82rem; min-height: 44px; gap: 0.4rem; }
+
+  /* النوافذ المنبثقة على شكل ورقة سفلية (Bottom Sheet) سهلة اللمس */
+  .modal-backdrop { align-items: flex-end; justify-content: center; }
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh;
+    max-height: 92dvh;
+    border-radius: 1.25rem 1.25rem 0 0;
+    padding: 1rem 1rem calc(1.25rem + env(safe-area-inset-bottom)) !important;
+    transform: translateY(100%);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .modal-backdrop.active .modal-content { transform: translateY(0); }
+  .modal-content form button[type="submit"],
+  .modal-content form button[type="button"] { min-height: 44px; }
+  .modal-content input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  .modal-content select { min-height: 44px; }
+
+  /* بطاقات وجداول */
+  .glass-card { border-radius: 0.9rem; }
+  .stat-card { padding: 0.9rem; }
+  .custom-table td, .custom-table th { padding: 0.6rem 0.65rem; font-size: 0.78rem; }
+
+  /* بوابة المودريتور: أهداف لمس مريحة */
+  #view-checkin button, #view-checkin select { min-height: 44px; }
+
+  /* رسائل SweetAlert */
+  .swal2-popup { width: 92% !important; padding: 1.1rem !important; }
+  .swal2-title { font-size: 1.15rem !important; }
+}
+
+/* شاشات صغيرة جداً */
+@media (max-width: 380px) {
+  .nav-tab-btn span { font-size: 0.76rem; }
+  .stat-card { padding: 0.75rem; }
+  .plat-chip { padding: 0.45rem 0.8rem; }
+}
+
+/* مراعاة المناطق الآمنة (النوتش وشريط الإيماءات) */
+@supports (padding: max(0px)) {
+  #view-checkin footer { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+}
+
+/* احترام تفضيل تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
@@ -455,20 +584,20 @@ body {
 
     <div id="view-admin" class="system-view hidden min-h-screen flex flex-col">
 <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <!-- Brand Logo & Title -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-200 shrink-0">
+                    <i data-lucide="shield-check" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
-                <div>
-                    <h1 class="text-lg font-black text-slate-900 leading-tight">نظام إدارة ومتابعة المودريتورز</h1>
-                    <p class="text-xs text-slate-500 font-medium">لوحة التحكم والمتابعة الشاملة لصفحات السوشيال ميديا</p>
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-lg font-black text-slate-900 leading-tight truncate">نظام إدارة ومتابعة المودريتورز</h1>
+                    <p class="hidden sm:block text-xs text-slate-500 font-medium">لوحة التحكم والمتابعة الشاملة لصفحات السوشيال ميديا</p>
                 </div>
             </div>
 
             <!-- Live Clock & Status Info -->
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                 <div class="hidden md:flex items-center gap-3 px-3.5 py-1.5 bg-slate-100/80 rounded-xl text-xs text-slate-600 border border-slate-200/60">
                     <div class="flex items-center gap-1.5">
                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-indigo-600"></i>
@@ -489,7 +618,7 @@ body {
                 </button>
 
                 <!-- Admin User Badge & Logout -->
-                <div class="flex items-center gap-2 pl-1 border-r border-slate-200 pr-3 mr-1">
+                <div class="flex items-center gap-2 pl-1 border-r border-slate-200 pr-2 sm:pr-3 mr-0 sm:mr-1">
                     <div class="hidden lg:flex items-center gap-2">
                         <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
                             م
@@ -506,14 +635,14 @@ body {
                 <button onclick="openAddDailyLogModal()"
  class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-indigo-200 transition">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    <span>+ تسجيل إنجاز يومي</span>
+                    <span class="hidden sm:inline">+ تسجيل إنجاز يومي</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Main Navigation Bar (Tabs) -->
-    <div class="bg-white border-b border-slate-200 sticky top-16 z-20 overflow-x-auto">
+    <div class="bg-white border-b border-slate-200 sticky top-16 z-20 nav-tabs-scroll">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-2 py-2">
             <button class="nav-tab-btn active" data-tab="dashboard">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
@@ -559,7 +688,7 @@ body {
         <section id="tab-dashboard" class="tab-content space-y-6">
             
             <!-- Quick KPI Cards Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
                 <div class="stat-card" style="--stat-color: #3b82f6;">
                     <div class="text-xs text-slate-500 font-bold mb-1 flex items-center justify-between">
                         <span>المتواجدون الآن</span>
@@ -576,6 +705,15 @@ body {
                     </div>
                     <div id="dashTodayMessages" class="text-xl font-black text-slate-800">--</div>
                     <div class="text-2xs text-indigo-600 font-semibold mt-1">تم الرد عليها</div>
+                </div>
+
+                <div class="stat-card" style="--stat-color: #0ea5e9;">
+                    <div class="text-xs text-slate-500 font-bold mb-1 flex items-center justify-between">
+                        <span>تعليقات اليوم</span>
+                        <i data-lucide="message-square" class="w-4 h-4 text-sky-500"></i>
+                    </div>
+                    <div id="dashTodayComments" class="text-xl font-black text-slate-800">--</div>
+                    <div class="text-2xs text-sky-600 font-semibold mt-1">تم الرد عليها</div>
                 </div>
 
                 <div class="stat-card" style="--stat-color: #10b981;">
@@ -622,9 +760,9 @@ body {
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
                             <span class="pulse-dot"></span>
-                            <h3 class="font-black text-slate-900 text-base">من متواجد في الشفت الآن؟ (Live Status)</h3>
+                            <h3 class="font-black text-slate-900 text-sm sm:text-base">من متواجد في الشفت الآن؟ (Live Status)</h3>
                         </div>
-                        <span class="text-xs text-slate-400">انقر على الأيقونة لتغيير الحالة فورياً</span>
+                        <span class="hidden sm:inline text-xs text-slate-400">انقر على الأيقونة لتغيير الحالة فورياً</span>
                     </div>
                     <div id="liveShiftContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <!-- Rendered by app.js -->
@@ -701,16 +839,13 @@ body {
         <section id="tab-moderators" class="tab-content hidden space-y-6">
             <!-- Header with Search & Filter -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 glass-card p-4">
-                <div class="flex flex-1 items-center gap-3">
-                    <div class="relative flex-1">
+                <div class="flex flex-wrap flex-1 items-center gap-3">
+                    <div class="relative flex-1 min-w-[10rem] basis-full sm:basis-auto">
                         <input type="text" id="modSearchInput" oninput="renderModerators()" placeholder="ابحث باسم المودريتور، الهاتف، أو المسمى..." class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute right-3.5 top-3"></i>
                     </div>
                     <select id="modShiftFilter" onchange="renderModerators()" class="py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none">
                         <option value="all">كل الشفتات</option>
-                        <option value="shift_morning">صباحي</option>
-                        <option value="shift_evening">مسائي</option>
-                        <option value="shift_night">ليلي</option>
                     </select>
                     <select id="modStatusFilter" onchange="renderModerators()" class="py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none">
                         <option value="all">كل الحالات</option>
@@ -861,7 +996,7 @@ body {
         <section id="tab-kpis" class="tab-content hidden space-y-6">
             <!-- Filter Bar -->
             <div class="glass-card p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                <div class="flex flex-1 items-center gap-3">
+                <div class="flex flex-wrap flex-1 items-center gap-3">
                     <div>
                         <label class="text-2xs text-slate-400 block mb-1 font-bold">تصفية بالتاريخ:</label>
                         <input type="date" id="kpiDateFilter" onchange="renderDailyKPIs()" class="py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
@@ -873,7 +1008,7 @@ body {
                         </select>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                     <button onclick="exportKPIsToExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition">
                         <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
                         <span>تصدير إلى Excel</span>
@@ -885,7 +1020,7 @@ body {
                 </button>
 
                 <!-- Admin User Badge & Logout -->
-                <div class="flex items-center gap-2 pl-1 border-r border-slate-200 pr-3 mr-1">
+                <div class="flex items-center gap-2 pl-1 border-r border-slate-200 pr-2 sm:pr-3 mr-0 sm:mr-1">
                     <div class="hidden lg:flex items-center gap-2">
                         <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
                             م
@@ -938,7 +1073,7 @@ body {
         <!-- TAB 5: تقييم الجودة والرقابة (Quality Control & Audits) -->
         <!-- ========================================================================= -->
         <section id="tab-quality" class="tab-content hidden space-y-6">
-            <div class="glass-card p-5 flex items-center justify-between">
+            <div class="glass-card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h3 class="font-black text-slate-900 text-base">تقييم جودة المحادثات ومراقبة الأداء (QC Audits)</h3>
                     <p class="text-xs text-slate-500">تقييم أسلوب الردود، الالتزام بالسكريبت، حل المشكلات وسرعة التجاوب</p>
@@ -961,7 +1096,7 @@ body {
         <section id="tab-pages" class="tab-content hidden space-y-8">
             <!-- Social Media Pages Grid -->
             <div>
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div>
                         <h3 class="font-black text-slate-900 text-base">صفحات ومنصات السوشيال ميديا</h3>
                         <p class="text-xs text-slate-500">إدارة القنوات وتوزيع المودريتورز المسؤولين عنها</p>
@@ -978,7 +1113,7 @@ body {
 
             <!-- Canned Responses / Reply Bank -->
             <div class="border-t border-slate-200 pt-6">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div>
                         <h3 class="font-black text-slate-900 text-base">بنك الردود السريعة والسكريبتات (Reply Bank)</h3>
                         <p class="text-xs text-slate-500">نماذج الردود الجاهزة، الأسئلة الشائعة، وسياسات الاستبدال لنسخها بنقرة واحدة</p>
@@ -1000,10 +1135,10 @@ body {
         <!-- ========================================================================= -->
         <section id="tab-payroll" class="tab-content hidden space-y-6">
             <div class="glass-card p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-3 sm:gap-4">
                     <div>
                         <label class="text-2xs text-slate-400 block mb-1 font-bold">الشهر المحاسبي:</label>
-                        <input type="month" id="payrollMonthSelect" onchange="renderPayroll()" value="2026-08" class="py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none">
+                        <input type="month" id="payrollMonthSelect" onchange="renderPayroll()" class="py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none">
                     </div>
                     <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
                         <div class="text-2xs text-emerald-600 font-bold">إجمالي مسير الرواتب المستحق:</div>
@@ -1106,6 +1241,44 @@ body {
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Shift Manager (إدارة الشفتات وساعات العمل) -->
+                <div id="shiftManagerCard" class="glass-card p-4 sm:p-5 md:col-span-2">
+                    <div class="mb-4">
+                        <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+                            <i data-lucide="calendar-clock" class="w-4 h-4 text-indigo-600"></i>
+                            <span>إدارة الشفتات وساعات العمل</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">أضف شفتاً جديداً، أو عدّل اسمه وأوقات بدايته ونهايته، أو احذفه. تُحسب عدد ساعات الشفت تلقائياً (ويدعم الشفت الذي يمتد بعد منتصف الليل).</p>
+                    </div>
+
+                    <!-- Add shift -->
+                    <form onsubmit="addShiftFromForm(event)" class="grid grid-cols-2 md:grid-cols-[minmax(0,1fr)_9rem_9rem_8rem_auto] gap-3 items-end bg-indigo-50/60 p-3 rounded-xl border border-indigo-100 mb-4 text-xs">
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block font-bold text-indigo-950 mb-1" for="newShiftName">اسم الشفت الجديد:</label>
+                            <input type="text" id="newShiftName" required maxlength="40" placeholder="مثال: شفت الويك إند" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-indigo-950 mb-1" for="newShiftStart">يبدأ:</label>
+                            <input type="time" id="newShiftStart" required oninput="updateNewShiftHours()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-indigo-950 mb-1" for="newShiftEnd">ينتهي:</label>
+                            <input type="time" id="newShiftEnd" required oninput="updateNewShiftHours()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none">
+                        </div>
+                        <div class="col-span-1">
+                            <span class="block font-bold text-indigo-950 mb-1">عدد الساعات:</span>
+                            <div id="newShiftHours" class="h-[42px] flex items-center justify-center px-2 bg-white border border-dashed border-indigo-200 rounded-xl font-black text-indigo-700">--</div>
+                        </div>
+                        <button type="submit" class="col-span-1 md:col-span-1 h-[42px] px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black flex items-center justify-center gap-1.5 shadow-sm transition">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>إضافة الشفت</span>
+                        </button>
+                    </form>
+
+                    <!-- Existing shifts -->
+                    <div id="shiftManagerList" class="space-y-2.5"></div>
+                </div>
+
                 <!-- General Settings -->
                 <div class="glass-card p-5">
                     <h3 class="font-black text-slate-900 text-base mb-4 flex items-center gap-2">
@@ -1230,7 +1403,7 @@ body {
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">المسمى الوظيفي:</label>
-                        <input type="text" id="modFormRole" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <input type="text" id="modFormRole" required placeholder="مثال: مودريتور سوشيال ميديا" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">الشفت المخصص:</label>
@@ -1245,6 +1418,15 @@ body {
                             <option value="inactive">غير نشط</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200">
+                    <label class="block font-bold text-amber-900 mb-1.5" for="modFormPin">🔑 كود دخول المودريتور (PIN):</label>
+                    <div class="flex items-stretch gap-2">
+                        <input type="text" id="modFormPin" required inputmode="numeric" maxlength="6" minlength="4" pattern="[0-9]{4,6}" autocomplete="off" placeholder="من 4 إلى 6 أرقام" oninput="sanitizePinInput(this)" style="direction:ltr" class="flex-1 min-w-0 p-2.5 bg-white border border-amber-200 rounded-xl font-mono font-black tracking-widest text-center focus:ring-2 focus:ring-amber-400 focus:outline-none">
+                        <button type="button" onclick="generateRandomPin()" class="px-3 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl border border-amber-200 transition whitespace-nowrap">توليد كود</button>
+                    </div>
+                    <p class="text-2xs text-amber-800/80 mt-1.5 leading-relaxed">لا يستطيع المودريتور تسجيل حضور أو استراحة أو انصراف من البوابة إلا بعد إدخال هذا الكود. يظهر الكود لك في الملف الشامل للمودريتور.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
@@ -1423,27 +1605,27 @@ body {
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">عدد الرسائل:</label>
-                        <input type="number" id="logFormMessages" required class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        <input type="number" min="0" inputmode="numeric" id="logFormMessages" required placeholder="0" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">عدد التعليقات:</label>
-                        <input type="number" id="logFormComments" required class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        <input type="number" min="0" inputmode="numeric" id="logFormComments" required placeholder="0" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
                     </div>
                     <div>
                         <label class="block font-bold text-emerald-700 mb-1">الطلبات المؤكدة (أوردرات):</label>
-                        <input type="number" id="logFormOrders" required class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
+                        <input type="number" min="0" inputmode="numeric" id="logFormOrders" required placeholder="0" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-emerald-800 mb-1">قيمة المبيعات (ج.م):</label>
-                        <input type="number" id="logFormSales" required class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
+                        <input type="number" min="0" inputmode="numeric" id="logFormSales" required placeholder="0" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">الشكاوى المحلولة:</label>
-                        <input type="number" id="logFormComplaints" value="0" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        <input type="number" min="0" inputmode="numeric" id="logFormComplaints" placeholder="0" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
                     </div>
                     <div>
                         <label class="block font-bold text-indigo-700 mb-1">سرعة الرد (دقائق):</label>
-                        <input type="number" step="0.5" id="logFormResponseTime" value="3" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
+                        <input type="number" min="0" step="0.5" inputmode="decimal" id="logFormResponseTime" placeholder="اختياري" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
                     </div>
                 </div>
 
@@ -1571,7 +1753,7 @@ body {
     <div id="pageModal" class="modal-backdrop">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-                <h3 class="font-black text-slate-900 text-base">إضافة صفحة / منصة جديدة</h3>
+                <h3 id="pageModalTitle" class="font-black text-slate-900 text-base">إضافة صفحة / منصة جديدة</h3>
                 <button onclick="closeModal('pageModal')" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -1602,7 +1784,7 @@ body {
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">عدد المتابعين / الحالة:</label>
-                        <input type="text" id="pageFormFollowers" value="10K" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <input type="text" id="pageFormFollowers" placeholder="مثال: 10K" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">رابط الصفحة:</label>
@@ -1817,6 +1999,36 @@ body {
             </div>
         </div>
 
+        <!-- PIN Gate: يظهر بعد اختيار الاسم ولا تُفتح البوابة قبل التحقق من الكود -->
+        <div id="pinGateSection" class="glass-card p-4 space-y-3" style="display: none;">
+            <div class="flex items-center gap-3">
+                <div id="pinGateAvatar" class="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-white text-lg shadow-sm shrink-0">--</div>
+                <div class="min-w-0">
+                    <h3 id="pinGateName" class="font-extrabold text-slate-900 text-sm truncate">--</h3>
+                    <p class="text-2xs text-slate-500 font-medium">أدخل كود الدخول الخاص بك لفتح البوابة</p>
+                </div>
+            </div>
+
+            <div id="pinGateError" class="hidden p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold text-center"></div>
+
+            <div id="pinGateNoPin" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-bold leading-relaxed text-center">
+                لم يتم تعيين كود دخول لحسابك بعد. يرجى التواصل مع المدير ليضيف لك الكود.
+            </div>
+
+            <form id="pinGateForm" onsubmit="verifyModPin(event)" class="space-y-3" autocomplete="off">
+                <div class="relative">
+                    <input type="password" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••" oninput="sanitizePinInput(this)" style="direction:ltr" aria-label="كود الدخول" class="w-full py-3.5 px-12 bg-slate-50 border border-slate-200 rounded-xl text-center text-2xl font-black tracking-[0.4em] text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <button type="button" onclick="togglePasswordVisibility('pinInput', 'pinEyeIcon')" class="absolute left-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 focus:outline-none" title="إظهار / إخفاء الكود">
+                        <i id="pinEyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <button type="submit" id="pinSubmitBtn" class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-md shadow-indigo-200 transition">
+                    <i data-lucide="key-round" class="w-4 h-4"></i>
+                    <span>تأكيد الكود</span>
+                </button>
+            </form>
+        </div>
+
         <!-- Selected Moderator Info & Shift Details -->
         <div id="modCardSection" class="glass-card p-4 space-y-3" style="display: none;">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -1846,6 +2058,24 @@ body {
                     <span id="modAssignedPages" class="font-bold text-slate-800 truncate block">--</span>
                 </div>
             </div>
+
+            <button type="button" onclick="lockModeratorPortal()" class="w-full py-2 text-2xs font-bold text-slate-500 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 border border-slate-100 rounded-xl flex items-center justify-center gap-1.5 transition">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                <span>قفل البوابة / تبديل المودريتور</span>
+            </button>
+        </div>
+
+        <!-- Platforms currently being worked on (multi-select) -->
+        <div id="platformSection" class="glass-card p-4 space-y-2.5" style="display: none;">
+            <div class="flex items-center justify-between gap-2">
+                <h4 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
+                    <span>المنصات التي تعمل عليها الآن:</span>
+                </h4>
+                <button type="button" onclick="clearModPlatforms()" class="text-2xs font-bold text-slate-400 hover:text-rose-600 transition">مسح الكل</button>
+            </div>
+            <p class="text-2xs text-slate-500">اضغط على كل منصة تعمل عليها — يمكنك تحديد أكثر من منصة معاً، وتظهر للمدير لحظياً.</p>
+            <div id="platformChips" class="flex flex-wrap gap-2"></div>
         </div>
 
         <!-- Today's Attendance Status Card -->
@@ -1927,31 +2157,41 @@ body {
                     <form onsubmit="submitModDailyLog(event)" class="space-y-2.5">
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">الصفحة / المنصة:</label>
-                            <select id="modLogPage" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"></select>
+                            <select id="modLogPage" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-bold"></select>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">عدد الرسائل:</label>
-                                <input type="number" id="modLogMessages" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="مثال: 120">
+                                <input type="number" id="modLogMessages" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="0" min="0" inputmode="numeric">
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">عدد التعليقات:</label>
-                                <input type="number" id="modLogComments" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="مثال: 45">
+                                <input type="number" id="modLogComments" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="0" min="0" inputmode="numeric">
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block font-bold text-emerald-700 mb-1">الطلبات (أوردرات):</label>
-                                <input type="number" id="modLogOrders" required class="w-full p-2 bg-emerald-50/50 border border-emerald-200 rounded-xl font-bold" placeholder="مثال: 15">
+                                <input type="number" id="modLogOrders" required class="w-full p-2 bg-emerald-50/50 border border-emerald-200 rounded-xl font-bold" placeholder="0" min="0" inputmode="numeric">
                             </div>
                             <div>
                                 <label class="block font-bold text-emerald-800 mb-1">قيمة المبيعات (ج.م):</label>
-                                <input type="number" id="modLogSales" required class="w-full p-2 bg-emerald-50/50 border border-emerald-200 rounded-xl font-bold" placeholder="مثال: 8500">
+                                <input type="number" id="modLogSales" required class="w-full p-2 bg-emerald-50/50 border border-emerald-200 rounded-xl font-bold" placeholder="0" min="0" inputmode="numeric">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">الشكاوى المحلولة:</label>
+                                <input type="number" id="modLogComplaints" min="0" inputmode="numeric" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-indigo-700 mb-1">سرعة الرد (دقائق):</label>
+                                <input type="number" id="modLogResponseTime" min="0" step="0.5" inputmode="decimal" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl font-bold" placeholder="اختياري">
                             </div>
                         </div>
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">ملاحظات الإنجاز:</label>
-                            <input type="text" id="modLogNotes" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="أي ملاحظات حول تفاعل اليوم...">
+                            <input type="text" id="modLogNotes" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl" placeholder="ملاحظات (اختياري)">
                         </div>
                         <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs transition">
                             إرسال تقرير اليوم
@@ -2016,49 +2256,8 @@ const initialData = {
         ]
     },
 
-    // قائمة الصفحات والمنصات
-    pages: [
-        {
-            id: 'page_1',
-            name: 'متجر الأناقة فاشون',
-            platform: 'Facebook',
-            icon: 'facebook',
-            link: 'https://facebook.com/elegance.store',
-            followers: '150K',
-            category: 'ملابس وأزياء',
-            assignedMods: []
-        },
-        {
-            id: 'page_2',
-            name: 'إلكترونيات تك بلس',
-            platform: 'Instagram',
-            icon: 'instagram',
-            link: 'https://instagram.com/techplus.eg',
-            followers: '85K',
-            category: 'أجهزة وإلكترونيات',
-            assignedMods: []
-        },
-        {
-            id: 'page_3',
-            name: 'واتساب خدمة عملاء والمبيعات',
-            platform: 'WhatsApp',
-            icon: 'message-circle',
-            link: 'https://wa.me/201000000000',
-            followers: '24/7 نشط',
-            category: 'مبيعات ودعم مباشر',
-            assignedMods: []
-        },
-        {
-            id: 'page_4',
-            name: 'تيك توك براند الجمال',
-            platform: 'TikTok',
-            icon: 'video',
-            link: 'https://tiktok.com/@beauty.brand',
-            followers: '210K',
-            category: 'عناية وجمال',
-            assignedMods: []
-        }
-    ],
+    // قائمة الصفحات والمنصات (فارغة — أضفها من تبويب الصفحات)
+    pages: [],
 
     // قائمة المودريتورز
     moderators: [],
@@ -2075,49 +2274,8 @@ const initialData = {
     // سجل تسليم واستلام الشفتات (Shift Handover Notes)
     handoverNotes: [],
 
-    // بنك الردود السريعة والسكريبتات (Canned Responses / Scripts)
-    cannedResponses: [
-        {
-            id: 'script_1',
-            title: 'ترحيب فوري بالعميل الجديد',
-            category: 'ترحيب',
-            pageId: 'all',
-            content: 'أهلاً بحضرتك يا فندم في {اسم الصفحة}! يسعدنا تواصلك معنا، إزاي نقدر نساعدك النهاردة؟ 😊',
-            tags: ['ترحيب', 'بداية المحادثة']
-        },
-        {
-            id: 'script_2',
-            title: 'الاستفسار عن الأسعار ومصاريف الشحن',
-            category: 'الأسعار والشحن',
-            pageId: 'page_1',
-            content: 'سعر القطعة {السعر} ج.م ومتاح خصم 15% على القطعة الثانية! 🔥 الشحن متاح لجميع محافظات مصر والتوصيل خلال 2-4 أيام عمل مع إمكانية المعاينة قبل الاستلام.',
-            tags: ['أسعار', 'شحن', 'معاينة']
-        },
-        {
-            id: 'script_3',
-            title: 'تأكيد وحجز الأوردر فوراً',
-            category: 'إتمام الطلب',
-            pageId: 'all',
-            content: 'تمام يا فندم تم تسجيل طلبك بكل سرور! ❤️\nيرجى تأكيد البيانات:\n- الاسم ثلاثي:\n- رقم الهاتف:\n- رقم بديل:\n- العنوان بالتفصيل (المحافظة/المنطقة/الشارع):\n\nوهنتواصل مع حضرتك فور خروج الشحنة مع المندوب.',
-            tags: ['أوردر', 'حجز', 'بيانات']
-        },
-        {
-            id: 'script_4',
-            title: 'التعامل مع شكوى تأخير شحن',
-            category: 'حل المشكلات',
-            pageId: 'all',
-            content: 'بنعتذر جداً لحضرتك على أي تأخير يا فندم، حقك علينا تماماً. 🙏\nأنا بتابع حالاً مع قسم اللوجستيات وشركة الشحن وهرد على حضرتك خلال 15 دقيقة برقم البوليصة وموعد التسليم المحدد.',
-            tags: ['شكوى', 'تأخير', 'شحن']
-        },
-        {
-            id: 'script_5',
-            title: 'سياسة الاستبدال والاسترجاع',
-            category: 'سياسات',
-            pageId: 'all',
-            content: 'متاح الاستبدال والاسترجاع مجاناً خلال 14 يوم من الاستلام في حالة وجود أي عيب صناعة، أو الاستبدال لمقاس آخر بدفع مصاريف الشحن فقط بشرط أن يكون المنتج بحالته الأصلية.',
-            tags: ['استرجاع', 'استبدال', 'ضمان']
-        }
-    ],
+    // بنك الردود السريعة والسكريبتات (فارغ — أضف الردود من تبويب الصفحات وبنك الردود)
+    cannedResponses: [],
 
     // سجل الخصومات والمكافآت الإضافية
     adjustments: []
@@ -2134,6 +2292,8 @@ const DEFAULT_FIREBASE_CONFIG = {
 class DataStore {
     constructor() {
         this.data = this.load();
+        this.normalize();
+        if (this.cleanSeedData()) this.saveLocal(this.data);
         this.isServer = typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http');
         this.cloudConnected = false;
         this.fbDb = null;
@@ -2173,7 +2333,10 @@ class DataStore {
                     const cloudData = snapshot.val();
                     if (cloudData && (cloudData.settings || cloudData.pages || cloudData.moderators)) {
                         this.data = { ...initialData, ...cloudData };
+                        this.normalize();
+                        const _cleaned = this.cleanSeedData();
                         this.saveLocal(this.data);
+                        if (_cleaned) this.fbRef.set(this.data).catch(() => {});
                         this.cloudConnected = true;
                         window.dispatchEvent(new CustomEvent('db-synced', { detail: this.data }));
                         window.dispatchEvent(new CustomEvent('cloud-status', { detail: { connected: true } }));
@@ -2218,6 +2381,65 @@ class DataStore {
 
     isCloudActive() {
         return this.cloudConnected && this.fbRef !== null;
+    }
+
+    // ضمان سلامة البنية (الشفتات دائماً موجودة كمصفوفة)
+    normalize() {
+        if (!this.data.settings || typeof this.data.settings !== 'object') this.data.settings = {};
+        const st = this.data.settings;
+        if (!Array.isArray(st.shifts)) {
+            st.shifts = st.shifts && typeof st.shifts === 'object' ? Object.values(st.shifts) : [];
+        }
+        if (st.shifts.length === 0) {
+            st.shifts = JSON.parse(JSON.stringify(initialData.settings.shifts));
+        }
+        if (!st.currency) st.currency = initialData.settings.currency;
+        if (!st.adminUsername) st.adminUsername = 'admin';
+        if (!st.adminPassword) st.adminPassword = 'admin123';
+    }
+
+    // إزالة بيانات العرض التجريبية القديمة (الصفحات/الردود التي كانت تُضاف تلقائياً) — فقط إن كانت كما هي دون تعديل ودون استخدام
+    cleanSeedData() {
+        const d = this.data;
+        let changed = false;
+
+        const seedPages = {
+            page_1: 'متجر الأناقة فاشون',
+            page_2: 'إلكترونيات تك بلس',
+            page_3: 'واتساب خدمة عملاء والمبيعات',
+            page_4: 'تيك توك براند الجمال'
+        };
+        const seedScripts = {
+            script_1: 'ترحيب فوري بالعميل الجديد',
+            script_2: 'الاستفسار عن الأسعار ومصاريف الشحن',
+            script_3: 'تأكيد وحجز الأوردر فوراً',
+            script_4: 'التعامل مع شكوى تأخير شحن',
+            script_5: 'سياسة الاستبدال والاسترجاع'
+        };
+
+        const mods = Array.isArray(d.moderators) ? d.moderators : [];
+        const logs = Array.isArray(d.dailyLogs) ? d.dailyLogs : [];
+        const audits = Array.isArray(d.qualityAudits) ? d.qualityAudits : [];
+
+        if (Array.isArray(d.pages)) {
+            const before = d.pages.length;
+            d.pages = d.pages.filter(p => {
+                const isSeed = seedPages[p.id] && seedPages[p.id] === p.name;
+                if (!isSeed) return true;
+                const used = logs.some(l => l.pageId === p.id) ||
+                             audits.some(a => a.pageId === p.id) ||
+                             mods.some(m => (m.assignedPages || []).includes(p.id));
+                return used;
+            });
+            if (d.pages.length !== before) changed = true;
+        }
+
+        if (Array.isArray(d.cannedResponses)) {
+            const before = d.cannedResponses.length;
+            d.cannedResponses = d.cannedResponses.filter(sc => !(seedScripts[sc.id] && seedScripts[sc.id] === sc.title));
+            if (d.cannedResponses.length !== before) changed = true;
+        }
+        return changed;
     }
 
     load() {
@@ -2278,6 +2500,8 @@ class DataStore {
                 const result = await res.json();
                 if (result.data && (result.data.settings || result.data.pages || result.data.moderators)) {
                     this.data = { ...initialData, ...result.data };
+                    this.normalize();
+                    if (this.cleanSeedData()) this.save(this.data);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
                     if (typeof window !== 'undefined') {
                         window.dispatchEvent(new CustomEvent('db-synced', { detail: this.data }));
@@ -2312,6 +2536,7 @@ class DataStore {
             const parsed = JSON.parse(jsonString);
             if (parsed.moderators && parsed.pages) {
                 this.data = parsed;
+                this.normalize();
                 this.save();
                 return { success: true };
             } else {
@@ -2420,6 +2645,15 @@ class DataStore {
                 }).catch(e => {});
             }
         }
+    }
+
+    // المنصات التي يعمل عليها المودريتور حالياً (تُزامَن لحظياً مع لوحة المدير)
+    setModeratorPlatforms(modId, platforms) {
+        const mod = this.getModerator(modId);
+        if (!mod) return;
+        mod.activePlatforms = Array.isArray(platforms) ? platforms.slice() : [];
+        mod.platformsUpdatedAt = Date.now();
+        this.save();
     }
 
     getQualityAudits() { return this.data.qualityAudits || []; }
@@ -2816,20 +3050,221 @@ function populateModeratorDropdown() {
     `).join('');
 }
 
+// ---------- كود الدخول (PIN) لبوابة المودريتور ----------
+const PIN_SESSION_KEY = 'MODERATOR_PORTAL_VERIFIED_V1';
+const PIN_ATTEMPTS_KEY = 'MODERATOR_PORTAL_PIN_ATTEMPTS_V1';
+const PIN_MAX_ATTEMPTS = 5;
+const PIN_LOCK_SECONDS = 60;
+
+function getVerifiedMap() {
+    try { return JSON.parse(sessionStorage.getItem(PIN_SESSION_KEY) || '{}'); } catch (e) { return {}; }
+}
+function setVerifiedMap(map) {
+    try { sessionStorage.setItem(PIN_SESSION_KEY, JSON.stringify(map)); } catch (e) {}
+}
+function getPinAttempts() {
+    try { return JSON.parse(localStorage.getItem(PIN_ATTEMPTS_KEY) || '{}'); } catch (e) { return {}; }
+}
+function setPinAttempts(obj) {
+    try { localStorage.setItem(PIN_ATTEMPTS_KEY, JSON.stringify(obj)); } catch (e) {}
+}
+
+// هل تم التحقق من كود هذا المودريتور في الجلسة الحالية؟ (يبطل التحقق تلقائياً إذا غيّر المدير الكود)
+function isModVerified(modId) {
+    const mod = DB.getModerator(modId);
+    if (!mod || !mod.pin) return false;
+    return getVerifiedMap()[modId] === String(mod.pin);
+}
+
+// حارس: أي إجراء (حضور/استراحة/انصراف/تقرير...) يتطلب التحقق من الكود أولاً
+function ensureModVerified() {
+    if (selectedModId && isModVerified(selectedModId)) return true;
+    if (selectedModId) renderSelectedModerator();
+    return false;
+}
+
+const PORTAL_UNLOCKED_SECTIONS = ['modCardSection', 'attendanceStatusCard', 'actionButtonsSection', 'extraToolsSection', 'platformSection'];
+function setPortalUnlockedVisible(visible) {
+    PORTAL_UNLOCKED_SECTIONS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = visible ? 'block' : 'none';
+    });
+}
+
+function showPinGate(mod) {
+    setPortalUnlockedVisible(false);
+    const gate = document.getElementById('pinGateSection');
+    if (!gate) return;
+    gate.style.display = 'block';
+
+    const avatar = document.getElementById('pinGateAvatar');
+    avatar.textContent = mod.name.charAt(0);
+    avatar.style.backgroundColor = mod.avatarColor || '#4f46e5';
+    document.getElementById('pinGateName').textContent = mod.name;
+    document.getElementById('welcomeTitle').textContent = `أهلاً بك يا ${mod.name.split(' ')[0]}! 👋`;
+
+    const hasPin = !!mod.pin;
+    document.getElementById('pinGateNoPin').classList.toggle('hidden', hasPin);
+    document.getElementById('pinGateForm').style.display = hasPin ? '' : 'none';
+    if (window.lucide) lucide.createIcons();
+}
+
+function hidePinGate() {
+    const gate = document.getElementById('pinGateSection');
+    if (gate) gate.style.display = 'none';
+}
+
+function resetPinGateState() {
+    const input = document.getElementById('pinInput');
+    const err = document.getElementById('pinGateError');
+    if (input) {
+        input.value = '';
+        if (input.type === 'text') togglePasswordVisibility('pinInput', 'pinEyeIcon');
+    }
+    if (err) err.classList.add('hidden');
+}
+
+function showPinError(msg) {
+    const err = document.getElementById('pinGateError');
+    if (err) {
+        err.textContent = msg;
+        err.classList.remove('hidden');
+    }
+    const input = document.getElementById('pinInput');
+    if (input) {
+        input.classList.add('animate-pulse');
+        setTimeout(() => input.classList.remove('animate-pulse'), 500);
+        input.value = '';
+        input.focus();
+    }
+}
+
+function focusPinInput() {
+    setTimeout(() => {
+        const input = document.getElementById('pinInput');
+        if (input && input.offsetParent !== null) input.focus();
+    }, 80);
+}
+
+window.verifyModPin = function(e) {
+    if (e) e.preventDefault();
+    if (!selectedModId) return;
+    const mod = DB.getModerator(selectedModId);
+    if (!mod) return;
+
+    if (!mod.pin) {
+        showPinError('لم يتم تعيين كود دخول لحسابك بعد. تواصل مع المدير.');
+        return;
+    }
+
+    const attempts = getPinAttempts();
+    const rec = attempts[selectedModId] || { count: 0, lockUntil: 0 };
+    const now = Date.now();
+    if (rec.lockUntil && rec.lockUntil > now) {
+        const secs = Math.ceil((rec.lockUntil - now) / 1000);
+        showPinError(`تم إيقاف المحاولة مؤقتاً بسبب كثرة المحاولات الخاطئة. حاول بعد ${secs} ثانية.`);
+        return;
+    }
+
+    const entered = normalizeDigits(document.getElementById('pinInput').value);
+    if (entered.length < 4) {
+        showPinError('أدخل كود الدخول المكوّن من 4 إلى 6 أرقام.');
+        return;
+    }
+
+    if (entered === String(mod.pin)) {
+        delete attempts[selectedModId];
+        setPinAttempts(attempts);
+        const map = getVerifiedMap();
+        map[selectedModId] = String(mod.pin);
+        setVerifiedMap(map);
+        resetPinGateState();
+        renderSelectedModerator();
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'تم التحقق من الكود',
+            showConfirmButton: false,
+            timer: 1400
+        });
+    } else {
+        rec.count = (rec.count || 0) + 1;
+        if (rec.count >= PIN_MAX_ATTEMPTS) {
+            rec.count = 0;
+            rec.lockUntil = now + PIN_LOCK_SECONDS * 1000;
+            attempts[selectedModId] = rec;
+            setPinAttempts(attempts);
+            showPinError(`كود غير صحيح. تم إيقاف المحاولة لمدة ${PIN_LOCK_SECONDS} ثانية.`);
+        } else {
+            attempts[selectedModId] = rec;
+            setPinAttempts(attempts);
+            showPinError(`كود الدخول غير صحيح. المحاولات المتبقية: ${PIN_MAX_ATTEMPTS - rec.count}`);
+        }
+    }
+};
+
+// قفل البوابة (يطلب الكود من جديد)
+window.lockModeratorPortal = function() {
+    if (selectedModId) {
+        const map = getVerifiedMap();
+        delete map[selectedModId];
+        setVerifiedMap(map);
+    }
+    resetPinGateState();
+    renderSelectedModerator();
+    focusPinInput();
+};
+
+// ---------- المنصات التي يعمل عليها المودريتور حالياً ----------
+function renderPlatformChips(mod) {
+    const box = document.getElementById('platformChips');
+    if (!box) return;
+    const active = getModPlatforms(mod);
+    box.innerHTML = MOD_PLATFORMS.map(p => {
+        const on = active.includes(p.key);
+        const style = on ? `background:${p.color};color:${p.text};border-color:${p.color};` : '';
+        return `<button type="button" onclick="toggleModPlatform('${p.key}')" aria-pressed="${on}" class="plat-chip${on ? ' is-on' : ''}" style="${style}">
+            <span class="plat-chip-dot" style="background:${p.color}"></span>
+            <span>${p.label}</span>
+            ${on ? '<span aria-hidden="true">✓</span>' : ''}
+        </button>`;
+    }).join('');
+}
+
+window.toggleModPlatform = function(key) {
+    if (!ensureModVerified()) return;
+    const mod = DB.getModerator(selectedModId);
+    if (!mod) return;
+    const cur = getModPlatforms(mod).slice();
+    const idx = cur.indexOf(key);
+    if (idx >= 0) cur.splice(idx, 1); else cur.push(key);
+    DB.setModeratorPlatforms(selectedModId, cur);
+    renderPlatformChips(mod);
+};
+
+window.clearModPlatforms = function() {
+    if (!ensureModVerified()) return;
+    const mod = DB.getModerator(selectedModId);
+    if (!mod) return;
+    DB.setModeratorPlatforms(selectedModId, []);
+    renderPlatformChips(mod);
+};
+
 // عند تغيير المودريتور من القائمة
 window.onModeratorChange = function() {
     const select = document.getElementById('moderatorSelect');
     selectedModId = select.value;
+    resetPinGateState();
 
     if (!selectedModId) {
-        document.getElementById('modCardSection').style.display = 'none';
-        document.getElementById('attendanceStatusCard').style.display = 'none';
-        document.getElementById('actionButtonsSection').style.display = 'none';
-        document.getElementById('extraToolsSection').style.display = 'none';
+        setPortalUnlockedVisible(false);
+        hidePinGate();
         return;
     }
 
     renderSelectedModerator();
+    if (!isModVerified(selectedModId)) focusPinInput();
 };
 
 // عرض بيانات المودريتور المختار
@@ -2837,6 +3272,12 @@ function renderSelectedModerator() {
     if (!selectedModId) return;
     const mod = DB.getModerator(selectedModId);
     if (!mod) return;
+
+    // البوابة مقفلة حتى يتم إدخال كود الدخول الصحيح
+    if (!isModVerified(selectedModId)) {
+        showPinGate(mod);
+        return;
+    }
 
     const shifts = DB.data.settings.shifts || [];
     const shift = shifts.find(s => s.id === mod.shiftId) || { name: 'دوام عام', start: '09:00', end: '17:00' };
@@ -2846,11 +3287,9 @@ function renderSelectedModerator() {
         return p ? p.name : '';
     }).filter(Boolean).join('، ') || 'كل الصفحات';
 
-    // إظهار الأقسام
-    document.getElementById('modCardSection').style.display = 'block';
-    document.getElementById('attendanceStatusCard').style.display = 'block';
-    document.getElementById('actionButtonsSection').style.display = 'block';
-    document.getElementById('extraToolsSection').style.display = 'block';
+    // إظهار الأقسام (بعد التحقق من الكود)
+    hidePinGate();
+    setPortalUnlockedVisible(true);
 
     // تحديث بيانات الكارت
     const avatarEl = document.getElementById('modAvatar');
@@ -2862,7 +3301,7 @@ function renderSelectedModerator() {
     document.getElementById('welcomeTitle').textContent = `أهلاً بك يا ${mod.name.split(' ')[0]}! 👋`;
 
     document.getElementById('modShiftName').textContent = shift.name;
-    document.getElementById('modShiftHours').textContent = `من ${shift.start} إلى ${shift.end}`;
+    document.getElementById('modShiftHours').textContent = `من ${shift.start} إلى ${shift.end} (${formatShiftDuration(shiftDurationMinutes(shift.start, shift.end))})`;
     document.getElementById('modAssignedPages').textContent = assignedPageNames;
 
     // شارة الحالة الحالية
@@ -2945,13 +3384,14 @@ function renderSelectedModerator() {
     renderModHistory(mod);
     populateModLogPages(mod);
     populateModHandoverShifts();
+    renderPlatformChips(mod);
 
     if (window.lucide) lucide.createIcons();
 }
 
 // 1. تسجيل الحضور (Check-In)
 window.handleCheckIn = async function() {
-    if (!selectedModId) return;
+    if (!selectedModId || !ensureModVerified()) return;
     const mod = DB.getModerator(selectedModId);
     if (!mod) return;
 
@@ -3040,7 +3480,7 @@ window.handleCheckIn = async function() {
 
 // 2. الاستراحة (Break / Resume)
 window.handleToggleBreak = function() {
-    if (!selectedModId) return;
+    if (!selectedModId || !ensureModVerified()) return;
     const mod = DB.getModerator(selectedModId);
     if (!mod) return;
 
@@ -3069,7 +3509,7 @@ window.handleToggleBreak = function() {
 
 // 3. تسجيل الانصراف (Check-Out)
 window.handleCheckOut = async function() {
-    if (!selectedModId) return;
+    if (!selectedModId || !ensureModVerified()) return;
     const mod = DB.getModerator(selectedModId);
     if (!mod) return;
 
@@ -3105,6 +3545,9 @@ window.handleCheckOut = async function() {
         notes: existingAtt ? existingAtt.notes : 'انصراف منتظم'
     };
 
+    // عند الانصراف تُمسح المنصات النشطة
+    mod.activePlatforms = [];
+    mod.platformsUpdatedAt = Date.now();
     DB.saveAttendance(attRecord, 'off');
     renderSelectedModerator();
 
@@ -3175,9 +3618,11 @@ function populateModLogPages(mod) {
         ? pages.filter(p => mod.assignedPages.includes(p.id))
         : pages;
 
-    select.innerHTML = assigned.map(p => `
-        <option value="${p.id}">${p.name} (${p.platform})</option>
-    `).join('');
+    select.innerHTML = assigned.length > 0
+        ? assigned.map(p => `
+        <option value="${p.id}">${escapeHtml(p.name)} (${escapeHtml(p.platform)})</option>
+    `).join('')
+        : '<option value="">عام (بدون صفحة محددة)</option>';
 }
 
 // ملء الشفتات لتسليم الشفت
@@ -3193,7 +3638,7 @@ function populateModHandoverShifts() {
 // حفظ تقرير إنجاز يومي من المودريتور
 window.submitModDailyLog = function(e) {
     e.preventDefault();
-    if (!selectedModId) return;
+    if (!selectedModId || !ensureModVerified()) return;
 
     const pageId = document.getElementById('modLogPage').value;
     const messagesCount = Number(document.getElementById('modLogMessages').value) || 0;
@@ -3201,6 +3646,9 @@ window.submitModDailyLog = function(e) {
     const ordersCount = Number(document.getElementById('modLogOrders').value) || 0;
     const salesRevenue = Number(document.getElementById('modLogSales').value) || 0;
     const notes = document.getElementById('modLogNotes').value.trim();
+    const complaintsSolved = Number(document.getElementById('modLogComplaints')?.value) || 0;
+    const respRaw = document.getElementById('modLogResponseTime')?.value;
+    const avgResponseMinutes = (respRaw === '' || respRaw === undefined || isNaN(Number(respRaw))) ? null : Number(respRaw);
 
     const todayStr = new Date().toISOString().slice(0, 10);
     const mod = DB.getModerator(selectedModId);
@@ -3210,13 +3658,13 @@ window.submitModDailyLog = function(e) {
         date: todayStr,
         moderatorId: selectedModId,
         pageId: pageId,
-        shiftId: mod ? mod.shiftId : 'shift_morning',
+        shiftId: mod ? mod.shiftId : '',
         messagesCount,
         commentsCount,
         ordersCount,
         salesRevenue,
-        complaintsSolved: 0,
-        avgResponseMinutes: 2.5,
+        complaintsSolved,
+        avgResponseMinutes,
         notes: notes || 'تقرير مسجل ذاتياً من المودريتور'
     };
 
@@ -3235,12 +3683,14 @@ window.submitModDailyLog = function(e) {
     document.getElementById('modLogOrders').value = '';
     document.getElementById('modLogSales').value = '';
     document.getElementById('modLogNotes').value = '';
+    const _c = document.getElementById('modLogComplaints'); if (_c) _c.value = '';
+    const _r = document.getElementById('modLogResponseTime'); if (_r) _r.value = '';
 };
 
 // حفظ تسليم شفت من المودريتور
 window.submitModHandover = function(e) {
     e.preventDefault();
-    if (!selectedModId) return;
+    if (!selectedModId || !ensureModVerified()) return;
 
     const toShiftId = document.getElementById('modHandoverToShift').value;
     const urgentIssues = document.getElementById('modHandoverUrgent').value.trim();
@@ -3272,6 +3722,87 @@ window.submitModHandover = function(e) {
     document.getElementById('modHandoverUrgent').value = '';
     document.getElementById('modHandoverPending').value = '';
 };
+
+
+// ---------- دوال مساعدة عامة ----------
+// كتابة نص في عنصر إن وُجد (حتى لا يتوقف رسم اللوحة بسبب كارت غير موجود)
+function setStatText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+function escapeHtml(v) {
+    return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// المنصات المتاحة للمودريتور (نفس قيم منصات الصفحات)
+const MOD_PLATFORMS = [
+    { key: 'Facebook',  label: 'فيسبوك',   color: '#1877f2', text: '#ffffff' },
+    { key: 'Instagram', label: 'انستجرام', color: '#e1306c', text: '#ffffff' },
+    { key: 'WhatsApp',  label: 'واتساب',   color: '#16a34a', text: '#ffffff' },
+    { key: 'TikTok',    label: 'تيك توك',  color: '#111827', text: '#ffffff' },
+    { key: 'Snapchat',  label: 'سناب شات', color: '#fffc00', text: '#111111' },
+    { key: 'X',         label: 'X (تويتر)', color: '#0f1419', text: '#ffffff' }
+];
+
+// المنصات النشطة للمودريتور (تتحمل تحويل Firebase للمصفوفات إلى كائنات)
+function getModPlatforms(mod) {
+    const v = mod && mod.activePlatforms;
+    if (Array.isArray(v)) return v.filter(Boolean);
+    if (v && typeof v === 'object') return Object.values(v).filter(Boolean);
+    return [];
+}
+
+// تحويل الأرقام العربية/الفارسية إلى إنجليزية وإبقاء الأرقام فقط
+function normalizeDigits(v) {
+    return String(v == null ? '' : v)
+        .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+        .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+        .replace(/\D/g, '');
+}
+window.sanitizePinInput = function(el) {
+    const clean = normalizeDigits(el.value).slice(0, 6);
+    if (el.value !== clean) el.value = clean;
+};
+
+// مدة الشفت بالدقائق (يدعم الشفت الذي يعبر منتصف الليل). يرجع 0 إذا تطابق الوقتان.
+function shiftDurationMinutes(start, end) {
+    if (!start || !end) return null;
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    if ([sh, sm, eh, em].some(n => isNaN(n))) return null;
+    const a = sh * 60 + sm, b = eh * 60 + em;
+    if (a === b) return 0;
+    return b > a ? b - a : b + 1440 - a;
+}
+function formatShiftDuration(min) {
+    if (min === null || min === undefined) return '--';
+    if (min === 0) return '0 ساعة';
+    const h = Math.floor(min / 60), m = min % 60;
+    if (m === 0) {
+        if (h === 1) return 'ساعة واحدة';
+        if (h === 2) return 'ساعتان';
+        return h <= 10 ? `${h} ساعات` : `${h} ساعة`;
+    }
+    if (h === 0) return `${m} دقيقة`;
+    return `${h} ساعة و${m} دقيقة`;
+}
+function shiftCrossesMidnight(start, end) {
+    const d = shiftDurationMinutes(start, end);
+    if (!d) return false;
+    const [sh, sm] = start.split(':').map(Number);
+    return (sh * 60 + sm) + d > 1440;
+}
+
+// سرعة الرد: قيمة اختيارية — تُعرض "--" إذا لم تُسجّل
+function hasResponseValue(v) {
+    return v !== null && v !== undefined && v !== '' && Number(v) > 0;
+}
+function fmtResponse(v, unit) {
+    return hasResponseValue(v) ? `${v}${unit ? ' ' + unit : ''}` : '--';
+}
 
 
 /* --- PART 4: DASHBOARD APPLICATION LOGIC --- */
@@ -3344,6 +3875,11 @@ function switchTab(tabId) {
         btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
     });
 
+    const _activeBtn = document.querySelector('.nav-tab-btn.active');
+    if (_activeBtn && _activeBtn.scrollIntoView) {
+        try { _activeBtn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    }
+
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.add('hidden');
     });
@@ -3406,22 +3942,24 @@ function renderDashboard() {
     const totalOrdersToday = todayLogs.reduce((acc, l) => acc + (Number(l.ordersCount) || 0), 0);
     const totalSalesToday = todayLogs.reduce((acc, l) => acc + (Number(l.salesRevenue) || 0), 0);
 
-    const avgResponseTime = todayLogs.length > 0
-        ? (todayLogs.reduce((acc, l) => acc + (Number(l.avgResponseMinutes) || 0), 0) / todayLogs.length).toFixed(1)
-        : '2.5';
+    // متوسط سرعة الرد: من السجلات التي سُجّلت فيها سرعة رد فعلية فقط
+    const respLogs = todayLogs.filter(l => hasResponseValue(l.avgResponseMinutes));
+    const avgResponseTime = respLogs.length > 0
+        ? (respLogs.reduce((acc, l) => acc + Number(l.avgResponseMinutes), 0) / respLogs.length).toFixed(1)
+        : null;
 
     const avgQuality = audits.length > 0
         ? (audits.reduce((acc, a) => acc + (Number(a.totalScore) || 0), 0) / audits.length).toFixed(0)
-        : '92';
+        : null;
 
     // تحديث كروت الإحصائيات
-    document.getElementById('dashActiveMods').textContent = `${activeModsCount} / ${mods.length}`;
-    document.getElementById('dashTodayMessages').textContent = totalMessagesToday.toLocaleString('ar-EG');
-    document.getElementById('dashTodayComments').textContent = totalCommentsToday.toLocaleString('ar-EG');
-    document.getElementById('dashTodayOrders').textContent = totalOrdersToday.toLocaleString('ar-EG');
-    document.getElementById('dashTodaySales').textContent = `${totalSalesToday.toLocaleString('ar-EG')} ${DB.data.settings.currency}`;
-    document.getElementById('dashAvgResponse').textContent = `${avgResponseTime} دقيقة`;
-    document.getElementById('dashAvgQuality').textContent = `${avgQuality}%`;
+    setStatText('dashActiveMods', `${activeModsCount} / ${mods.length}`);
+    setStatText('dashTodayMessages', totalMessagesToday.toLocaleString('ar-EG'));
+    setStatText('dashTodayComments', totalCommentsToday.toLocaleString('ar-EG'));
+    setStatText('dashTodayOrders', totalOrdersToday.toLocaleString('ar-EG'));
+    setStatText('dashTodaySales', `${totalSalesToday.toLocaleString('ar-EG')} ${DB.data.settings.currency}`);
+    setStatText('dashAvgResponse', avgResponseTime !== null ? `${avgResponseTime} دقيقة` : '--');
+    setStatText('dashAvgQuality', avgQuality !== null ? `${avgQuality}%` : '--');
 
     // قائمة الشفت الحالي ومن متواجد
     renderLiveShiftBar(mods);
@@ -3459,15 +3997,19 @@ function renderLiveShiftBar(mods) {
         }
 
         const shift = DB.data.settings.shifts.find(s => s.id === mod.shiftId) || { name: 'دوام عام' };
+        const platformBadges = platformBadgesHtml(mod);
 
         return `
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-white hover:shadow-sm transition">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-sm" style="background-color: ${mod.avatarColor || '#4f46e5'}">
+            <div class="flex items-center justify-between gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-white hover:shadow-sm transition">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-sm shrink-0" style="background-color: ${mod.avatarColor || '#4f46e5'}">
                         ${mod.name.charAt(0)}
                     </div>
-                    <div>
-                        <div class="font-bold text-gray-800 text-sm">${mod.name}</div>
+                    <div class="min-w-0">
+                        <div class="font-bold text-gray-800 text-sm flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span class="truncate">${mod.name}</span>
+                            ${platformBadges}
+                        </div>
                         <div class="text-xs text-gray-500 flex items-center gap-2">
                             <span>${mod.role}</span>
                             <span>•</span>
@@ -3475,7 +4017,7 @@ function renderLiveShiftBar(mods) {
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 shrink-0">
                     ${statusBadge}
                     <div class="relative group">
                         <button onclick="toggleModStatus('${mod.id}')" class="p-1.5 hover:bg-gray-200 rounded-lg text-gray-600 text-xs transition" title="تغيير الحالة السريعة">
@@ -3488,6 +4030,16 @@ function renderLiveShiftBar(mods) {
     }).join('');
 }
 
+// شارات المنصات النشطة بجانب اسم المودريتور (تظهر فقط أثناء الشفت أو الاستراحة)
+function platformBadgesHtml(mod) {
+    if (mod.status !== 'active' && mod.status !== 'break') return '';
+    return getModPlatforms(mod).map(key => {
+        const p = MOD_PLATFORMS.find(x => x.key === key);
+        if (!p) return '';
+        return `<span class="plat-badge" style="background:${p.color};color:${p.text}" title="يعمل الآن على ${p.label}">${p.label}</span>`;
+    }).join('');
+}
+
 // تغيير حالة المودريتور السريعة
 window.toggleModStatus = function(modId) {
     const mod = DB.getModerator(modId);
@@ -3496,6 +4048,7 @@ window.toggleModStatus = function(modId) {
     const statuses = ['active', 'break', 'off'];
     const nextIndex = (statuses.indexOf(mod.status) + 1) % statuses.length;
     mod.status = statuses[nextIndex];
+    if (mod.status === 'off') mod.activePlatforms = [];
     DB.saveModerator(mod);
     renderDashboard();
     Swal.fire({
@@ -3527,10 +4080,10 @@ function renderLeaderboard(mods, logs, audits) {
         const modAudits = audits.filter(a => a.moderatorId === mod.id);
         const avgScore = modAudits.length > 0
             ? Math.round(modAudits.reduce((acc, a) => acc + (Number(a.totalScore) || 0), 0) / modAudits.length)
-            : 85;
+            : null;
 
         // نقاط الأداء الإجمالية (Weighted Score)
-        const overallScore = Math.round((totalMessages * 0.2) + (totalOrders * 5) + (avgScore * 0.5));
+        const overallScore = Math.round((totalMessages * 0.2) + (totalOrders * 5) + ((avgScore || 0) * 0.5));
 
         return {
             ...mod,
@@ -3568,7 +4121,7 @@ function renderLeaderboard(mods, logs, audits) {
                         <div class="text-xs text-gray-500 flex items-center gap-3 mt-1">
                             <span class="text-indigo-600 font-medium">💬 ${mod.totalMessages.toLocaleString('ar-EG')} رسالة</span>
                             <span class="text-emerald-600 font-medium">📦 ${mod.totalOrders.toLocaleString('ar-EG')} أوردر</span>
-                            <span class="text-purple-600 font-medium">⭐ تقييم ${mod.avgScore}%</span>
+                            <span class="text-purple-600 font-medium">⭐ تقييم ${mod.avgScore !== null ? mod.avgScore + '%' : '--'}</span>
                         </div>
                     </div>
                 </div>
@@ -3707,6 +4260,7 @@ function renderDashboardCharts() {
 
     const platLabels = Object.keys(platformCounts);
     const platData = Object.values(platformCounts);
+    const hasPlatData = platData.some(v => v > 0);
     const platColors = {
         'Facebook': '#1877f2',
         'Instagram': '#e1306c',
@@ -3720,10 +4274,10 @@ function renderDashboardCharts() {
     charts.platforms = new Chart(ctxPlatforms, {
         type: 'doughnut',
         data: {
-            labels: platLabels.length > 0 ? platLabels : ['فيسبوك', 'انستجرام', 'واتساب', 'تيك توك'],
+            labels: hasPlatData ? platLabels : ['لا توجد بيانات بعد'],
             datasets: [{
-                data: platData.length > 0 && platData.some(v => v > 0) ? platData : [45, 25, 20, 10],
-                backgroundColor: platLabels.map(p => platColors[p] || '#6366f1'),
+                data: hasPlatData ? platData : [1],
+                backgroundColor: hasPlatData ? platLabels.map(p => platColors[p] || '#6366f1') : ['#e2e8f0'],
                 borderWidth: 2,
                 borderColor: '#ffffff'
             }]
@@ -3732,7 +4286,8 @@ function renderDashboardCharts() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom', rtl: true, labels: { font: { family: 'Cairo' } } }
+                legend: { position: 'bottom', rtl: true, labels: { font: { family: 'Cairo' } } },
+                tooltip: { enabled: hasPlatData }
             }
         }
     });
@@ -3741,7 +4296,19 @@ function renderDashboardCharts() {
 /* ==========================================================================
    2. سجل ودليل المودريتورز (Moderators Directory)
    ========================================================================== */
+// تعبئة فلتر الشفتات ديناميكياً من إعدادات الشفتات
+function populateShiftFilter() {
+    const sel = document.getElementById('modShiftFilter');
+    if (!sel) return;
+    const current = sel.value || 'all';
+    const shifts = (DB.data.settings && DB.data.settings.shifts) || [];
+    sel.innerHTML = '<option value="all">كل الشفتات</option>' +
+        shifts.map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name)}</option>`).join('');
+    sel.value = shifts.some(x => x.id === current) ? current : 'all';
+}
+
 function renderModerators() {
+    populateShiftFilter();
     const mods = DB.getModerators();
     const pages = DB.getPages();
     const shifts = DB.data.settings.shifts;
@@ -3861,11 +4428,12 @@ window.openAddModeratorModal = function() {
     document.getElementById('modFormPhone').value = '';
     document.getElementById('modFormEmail').value = '';
     document.getElementById('modFormNationalId').value = '';
-    document.getElementById('modFormRole').value = 'مودريتور سوشيال ميديا';
-    document.getElementById('modFormSalary').value = '4000';
-    document.getElementById('modFormCommission').value = '15';
-    document.getElementById('modFormTarget').value = '1500';
-    document.getElementById('modFormStatus').value = 'active';
+    document.getElementById('modFormRole').value = '';
+    document.getElementById('modFormSalary').value = '';
+    document.getElementById('modFormCommission').value = '';
+    document.getElementById('modFormTarget').value = '';
+    document.getElementById('modFormPin').value = '';
+    document.getElementById('modFormStatus').value = 'off';
     document.getElementById('modFormNotes').value = '';
 
     // توليد خيارات الشفتات والصفحات
@@ -3887,6 +4455,7 @@ window.openEditModeratorModal = function(modId) {
     document.getElementById('modFormSalary').value = mod.baseSalary;
     document.getElementById('modFormCommission').value = mod.commissionPerOrder;
     document.getElementById('modFormTarget').value = mod.monthlyTarget;
+    document.getElementById('modFormPin').value = mod.pin || '';
     document.getElementById('modFormStatus').value = mod.status;
     document.getElementById('modFormNotes').value = mod.notes || '';
 
@@ -3901,13 +4470,27 @@ function populateShiftAndPagesCheckboxes(selectedPages = [], selectedShift = '')
     `).join('');
 
     const pagesContainer = document.getElementById('modFormPagesContainer');
-    pagesContainer.innerHTML = DB.getPages().map(p => `
+    const _pgs = DB.getPages();
+    if (_pgs.length === 0) {
+        pagesContainer.innerHTML = '<div class="col-span-2 text-2xs text-slate-400 p-2">لا توجد صفحات مسجلة بعد — أضفها من تبويب "الصفحات وبنك الردود" ثم أسندها للمودريتور.</div>';
+    } else pagesContainer.innerHTML = _pgs.map(p => `
         <label class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg text-xs cursor-pointer hover:bg-indigo-50 transition border border-gray-200">
             <input type="checkbox" name="assignedPages" value="${p.id}" ${selectedPages.includes(p.id) ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-indigo-500">
             <span class="font-medium text-gray-800">${p.name} (${p.platform})</span>
         </label>
     `).join('');
 }
+
+// توليد كود دخول عشوائي من 4 أرقام
+window.generateRandomPin = function() {
+    let n;
+    if (window.crypto && crypto.getRandomValues) {
+        n = crypto.getRandomValues(new Uint32Array(1))[0] % 9000;
+    } else {
+        n = Math.floor(Math.random() * 9000);
+    }
+    document.getElementById('modFormPin').value = String(1000 + n);
+};
 
 // حفظ بيانات المودريتور
 window.saveModeratorForm = function(e) {
@@ -3924,6 +4507,18 @@ window.saveModeratorForm = function(e) {
     const monthlyTarget = Number(document.getElementById('modFormTarget').value) || 0;
     const status = document.getElementById('modFormStatus').value;
     const notes = document.getElementById('modFormNotes').value.trim();
+    const pin = normalizeDigits(document.getElementById('modFormPin').value);
+
+    if (!/^\d{4,6}$/.test(pin)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'كود الدخول غير صالح',
+            text: 'كود دخول المودريتور يجب أن يتكون من 4 إلى 6 أرقام.',
+            confirmButtonColor: '#4f46e5',
+            confirmButtonText: 'حسناً'
+        });
+        return;
+    }
 
     const assignedPages = Array.from(document.querySelectorAll('input[name="assignedPages"]:checked')).map(cb => cb.value);
 
@@ -3933,8 +4528,10 @@ window.saveModeratorForm = function(e) {
     const avatarColor = existing ? existing.avatarColor : colors[Math.floor(Math.random() * colors.length)];
 
     const modData = {
+        ...(existing || {}),
         id,
         name,
+        pin,
         phone,
         email,
         nationalId,
@@ -3947,7 +4544,8 @@ window.saveModeratorForm = function(e) {
         monthlyTarget,
         status,
         avatarColor,
-        notes
+        notes,
+        activePlatforms: (status === 'off' || status === 'inactive') ? [] : getModPlatforms(existing)
     };
 
     DB.saveModerator(modData);
@@ -3994,6 +4592,18 @@ window.confirmDeleteModerator = function(modId) {
     });
 };
 
+// نسخ كود دخول المودريتور
+window.copyModPin = function(pin) {
+    const done = () => Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'تم نسخ الكود', showConfirmButton: false, timer: 1400 });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(String(pin)).then(done).catch(() => {
+            Swal.fire({ icon: 'info', title: 'كود الدخول', text: String(pin) });
+        });
+    } else {
+        Swal.fire({ icon: 'info', title: 'كود الدخول', text: String(pin) });
+    }
+};
+
 // الملف الشامل للمودريتور (Profile Modal)
 window.openModeratorProfileModal = function(modId) {
     const mod = DB.getModerator(modId);
@@ -4011,7 +4621,7 @@ window.openModeratorProfileModal = function(modId) {
     const totalSales = logs.reduce((acc, l) => acc + (Number(l.salesRevenue) || 0), 0);
     const avgScore = audits.length > 0
         ? Math.round(audits.reduce((acc, a) => acc + (Number(a.totalScore) || 0), 0) / audits.length)
-        : 90;
+        : null;
 
     document.getElementById('profileModalHeader').innerHTML = `
         <div class="flex items-center gap-4">
@@ -4021,11 +4631,20 @@ window.openModeratorProfileModal = function(modId) {
             <div>
                 <h2 class="text-xl font-bold text-gray-800">${mod.name}</h2>
                 <p class="text-sm text-indigo-600 font-semibold">${mod.role} • <span class="text-gray-500">${shift.name}</span></p>
-                <div class="text-xs text-gray-400 mt-1 flex items-center gap-4">
+                <div class="text-xs text-gray-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
                     <span>📱 ${mod.phone}</span>
                     <span>✉️ ${mod.email || 'غير مسجل'}</span>
                     <span>📅 انضم في: ${mod.joinDate}</span>
                 </div>
+                ${mod.pin ? `
+                <div class="mt-2.5 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl text-xs">
+                    <span class="font-bold text-amber-800">🔑 كود الدخول:</span>
+                    <span class="font-mono font-black text-base tracking-widest text-amber-950" style="direction:ltr">${escapeHtml(mod.pin)}</span>
+                    <button type="button" onclick="copyModPin('${escapeHtml(mod.pin)}')" class="px-2 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-lg transition">نسخ</button>
+                </div>` : `
+                <div class="mt-2.5 inline-flex items-center gap-2 px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold">
+                    🔑 لم يُعيَّن كود دخول بعد — افتح "تعديل البيانات" لإضافته.
+                </div>`}
             </div>
         </div>
     `;
@@ -4046,7 +4665,7 @@ window.openModeratorProfileModal = function(modId) {
             </div>
             <div class="p-3 bg-purple-50 border border-purple-100 rounded-xl text-center">
                 <div class="text-xs text-purple-600 font-bold">متوسط الجودة QC</div>
-                <div class="text-lg font-extrabold text-purple-900 mt-1">${avgScore}%</div>
+                <div class="text-lg font-extrabold text-purple-900 mt-1">${avgScore !== null ? avgScore + '%' : '--'}</div>
             </div>
         </div>
     `;
@@ -4077,7 +4696,7 @@ window.openModeratorProfileModal = function(modId) {
                                 <td>${l.commentsCount}</td>
                                 <td class="font-bold text-emerald-600">${l.ordersCount}</td>
                                 <td>${(Number(l.salesRevenue) || 0).toLocaleString('ar-EG')} ${DB.data.settings.currency}</td>
-                                <td>${l.avgResponseMinutes} دقيقة</td>
+                                <td>${fmtResponse(l.avgResponseMinutes, 'دقيقة')}</td>
                             </tr>
                         `;
                     }).join('')}
@@ -4371,7 +4990,7 @@ function renderDailyKPIs() {
                 <td class="font-bold text-emerald-600">${Number(log.ordersCount).toLocaleString('ar-EG')}</td>
                 <td class="font-bold text-emerald-700">${Number(log.salesRevenue).toLocaleString('ar-EG')} ${DB.data.settings.currency}</td>
                 <td><span class="badge ${convRate >= 10 ? 'badge-active' : 'badge-break'}">${convRate}%</span></td>
-                <td><span class="font-semibold text-indigo-700">${log.avgResponseMinutes} د</span></td>
+                <td><span class="font-semibold text-indigo-700">${fmtResponse(log.avgResponseMinutes, 'د')}</span></td>
                 <td>
                     <button onclick="confirmDeleteDailyLog('${log.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded" title="حذف السجل">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -4388,20 +5007,26 @@ function renderDailyKPIs() {
 window.openAddDailyLogModal = function() {
     const mods = DB.getModerators();
     const pages = DB.getPages();
-    const shifts = DB.data.settings.shifts;
 
-    document.getElementById('logFormMod').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
-    document.getElementById('logFormPage').innerHTML = pages.map(p => `<option value="${p.id}">${p.name} (${p.platform})</option>`).join('');
-    document.getElementById('logFormShift').innerHTML = shifts.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    if (mods.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'لا يوجد مودريتورز بعد',
+            text: 'أضف مودريتور واحداً على الأقل من تبويب "سجل المودريتورز" قبل تسجيل تقرير يومي.',
+            confirmButtonColor: '#4f46e5',
+            confirmButtonText: 'حسناً'
+        });
+        return;
+    }
+
+    document.getElementById('logFormMod').innerHTML = mods.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
+    document.getElementById('logFormPage').innerHTML = pages.length > 0
+        ? pages.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (${escapeHtml(p.platform)})</option>`).join('')
+        : '<option value="">عام (بدون صفحة محددة)</option>';
 
     document.getElementById('logFormDate').value = new Date().toISOString().slice(0, 10);
-    document.getElementById('logFormMessages').value = '100';
-    document.getElementById('logFormComments').value = '30';
-    document.getElementById('logFormOrders').value = '10';
-    document.getElementById('logFormSales').value = '5000';
-    document.getElementById('logFormComplaints').value = '1';
-    document.getElementById('logFormResponseTime').value = '3';
-    document.getElementById('logFormNotes').value = '';
+    ['logFormMessages', 'logFormComments', 'logFormOrders', 'logFormSales', 'logFormComplaints', 'logFormResponseTime', 'logFormNotes']
+        .forEach(id => { document.getElementById(id).value = ''; });
 
     openModal('dailyLogModal');
 };
@@ -4410,14 +5035,16 @@ window.saveDailyLogForm = function(e) {
     e.preventDefault();
     const moderatorId = document.getElementById('logFormMod').value;
     const pageId = document.getElementById('logFormPage').value;
-    const shiftId = document.getElementById('logFormShift').value;
+    const _mod = DB.getModerator(moderatorId);
+    const shiftId = _mod ? (_mod.shiftId || '') : '';
     const date = document.getElementById('logFormDate').value;
     const messagesCount = Number(document.getElementById('logFormMessages').value) || 0;
     const commentsCount = Number(document.getElementById('logFormComments').value) || 0;
     const ordersCount = Number(document.getElementById('logFormOrders').value) || 0;
     const salesRevenue = Number(document.getElementById('logFormSales').value) || 0;
     const complaintsSolved = Number(document.getElementById('logFormComplaints').value) || 0;
-    const avgResponseMinutes = Number(document.getElementById('logFormResponseTime').value) || 0;
+    const _respRaw = document.getElementById('logFormResponseTime').value;
+    const avgResponseMinutes = (_respRaw === '' || isNaN(Number(_respRaw))) ? null : Number(_respRaw);
     const notes = document.getElementById('logFormNotes').value.trim();
 
     const logRecord = {
@@ -4480,7 +5107,7 @@ window.exportKPIsToExcel = function() {
             'الأوردرات المغلقة': l.ordersCount,
             'إجمالي المبيعات (ج.م)': l.salesRevenue,
             'الشكاوى المحلولة': l.complaintsSolved,
-            'متوسط سرعة الرد (دقائق)': l.avgResponseMinutes,
+            'متوسط سرعة الرد (دقائق)': hasResponseValue(l.avgResponseMinutes) ? l.avgResponseMinutes : '',
             'ملاحظات': l.notes || ''
         };
     });
@@ -4715,7 +5342,9 @@ function renderPagesAndScripts() {
 
     // 1. عرض كروت الصفحات
     const pagesContainer = document.getElementById('pagesGridContainer');
-    if (pagesContainer) {
+    if (pagesContainer && pages.length === 0) {
+        pagesContainer.innerHTML = `<div class="col-span-full text-center text-gray-400 text-sm py-10 bg-white rounded-2xl border border-gray-100 p-6">لا توجد صفحات مسجلة بعد. اضغط "+ إضافة صفحة جديدة" لتبدأ.</div>`;
+    } else if (pagesContainer) {
         pagesContainer.innerHTML = pages.map(page => {
             const assignedModsList = (page.assignedMods || []).map(mId => {
                 const mod = mods.find(m => m.id === mId);
@@ -4732,7 +5361,7 @@ function renderPagesAndScripts() {
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-gray-800 text-sm">${page.name}</h4>
-                                    <span class="text-xs text-gray-400">${page.category} • ${page.followers}</span>
+                                    <span class="text-xs text-gray-400">${[page.category, page.followers].filter(Boolean).map(escapeHtml).join(' • ') || 'بدون تصنيف'}</span>
                                 </div>
                             </div>
                             <button onclick="confirmDeletePage('${page.id}')" class="text-gray-400 hover:text-red-600 p-1">
@@ -4747,9 +5376,9 @@ function renderPagesAndScripts() {
                         </div>
                     </div>
                     <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <a href="${page.link}" target="_blank" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                        ${page.link ? `<a href="${escapeHtml(page.link)}" target="_blank" rel="noopener" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
                             زيارة الصفحة <i data-lucide="external-link" class="w-3 h-3"></i>
-                        </a>
+                        </a>` : '<span class="text-xs text-gray-300">لا يوجد رابط</span>'}
                         <button onclick="openEditPageModal('${page.id}')" class="text-xs text-gray-500 hover:text-indigo-600 font-medium">تعديل</button>
                     </div>
                 </div>
@@ -4759,7 +5388,9 @@ function renderPagesAndScripts() {
 
     // 2. عرض بنك الردود السريعة
     const scriptsContainer = document.getElementById('scriptsGridContainer');
-    if (scriptsContainer) {
+    if (scriptsContainer && scripts.length === 0) {
+        scriptsContainer.innerHTML = `<div class="col-span-full text-center text-gray-400 text-sm py-10 bg-white rounded-2xl border border-gray-100 p-6">بنك الردود فارغ. أضف أول سكريبت من زر "+ إضافة سكريبت جديد".</div>`;
+    } else if (scriptsContainer) {
         scriptsContainer.innerHTML = scripts.map(script => {
             return `
                 <div class="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition flex flex-col justify-between">
@@ -4807,12 +5438,27 @@ window.copyScriptText = function(scriptId) {
 
 // إضافة صفحة جديدة
 window.openAddPageModal = function() {
+    document.getElementById('pageModalTitle').textContent = 'إضافة صفحة / منصة جديدة';
     document.getElementById('pageFormId').value = '';
     document.getElementById('pageFormName').value = '';
     document.getElementById('pageFormPlatform').value = 'Facebook';
-    document.getElementById('pageFormCategory').value = 'متجر وتجارة إلكترونية';
-    document.getElementById('pageFormFollowers').value = '50K';
-    document.getElementById('pageFormLink').value = 'https://';
+    document.getElementById('pageFormCategory').value = '';
+    document.getElementById('pageFormFollowers').value = '';
+    document.getElementById('pageFormLink').value = '';
+    openModal('pageModal');
+};
+
+// تعديل صفحة موجودة
+window.openEditPageModal = function(pageId) {
+    const page = DB.getPage(pageId);
+    if (!page) return;
+    document.getElementById('pageModalTitle').textContent = 'تعديل بيانات الصفحة';
+    document.getElementById('pageFormId').value = page.id;
+    document.getElementById('pageFormName').value = page.name || '';
+    document.getElementById('pageFormPlatform').value = page.platform || 'Facebook';
+    document.getElementById('pageFormCategory').value = page.category || '';
+    document.getElementById('pageFormFollowers').value = page.followers || '';
+    document.getElementById('pageFormLink').value = page.link || '';
     openModal('pageModal');
 };
 
@@ -4825,14 +5471,17 @@ window.savePageForm = function(e) {
     const followers = document.getElementById('pageFormFollowers').value.trim();
     const link = document.getElementById('pageFormLink').value.trim();
 
+    const existing = DB.getPage(id);
+
     DB.savePage({
+        ...(existing || {}),
         id,
         name,
         platform,
         category,
         followers,
         link,
-        assignedMods: []
+        assignedMods: existing ? (existing.assignedMods || []) : []
     });
 
     closeModal('pageModal');
@@ -4920,7 +5569,9 @@ function renderPayroll() {
     const logs = DB.getDailyLogs();
     const adjustments = DB.getAdjustments();
 
-    const currentMonth = document.getElementById('payrollMonthSelect')?.value || new Date().toISOString().slice(0, 7);
+    const _monthEl = document.getElementById('payrollMonthSelect');
+    if (_monthEl && !_monthEl.value) _monthEl.value = new Date().toISOString().slice(0, 7);
+    const currentMonth = (_monthEl && _monthEl.value) || new Date().toISOString().slice(0, 7);
 
     // تصفية بيانات الشهر المحدد
     const container = document.getElementById('payrollTableBody');
@@ -5074,7 +5725,7 @@ window.openAddAdjustmentModal = function() {
     document.getElementById('adjFormMod').innerHTML = mods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
     document.getElementById('adjFormMonth').value = new Date().toISOString().slice(0, 7);
     document.getElementById('adjFormType').value = 'bonus';
-    document.getElementById('adjFormAmount').value = '200';
+    document.getElementById('adjFormAmount').value = '';
     document.getElementById('adjFormReason').value = '';
     openModal('adjustmentModal');
 };
@@ -5111,6 +5762,186 @@ window.saveAdjustmentForm = function(e) {
 /* ==========================================================================
    8. الإعدادات والنسخ الاحتياطي والمزامنة السحابية (Settings & Cloud Sync)
    ========================================================================== */
+// ==========================================================================
+// إدارة الشفتات وساعات العمل (Shift Manager)
+// ==========================================================================
+function renderShiftManager() {
+    const list = document.getElementById('shiftManagerList');
+    if (!list) return;
+    const shifts = DB.data.settings.shifts || [];
+    const mods = DB.getModerators();
+
+    list.innerHTML = shifts.map(sh => {
+        const count = mods.filter(m => m.shiftId === sh.id).length;
+        const dur = shiftDurationMinutes(sh.start, sh.end);
+        const overnight = shiftCrossesMidnight(sh.start, sh.end);
+        const sid = escapeHtml(sh.id);
+        return `
+        <div class="shift-row p-3 bg-white border border-slate-200 rounded-xl grid grid-cols-2 md:grid-cols-[minmax(0,1fr)_9rem_9rem_9rem_auto] gap-2.5 items-end text-xs" data-shift-id="${sid}">
+            <label class="col-span-2 md:col-span-1 block">
+                <span class="block text-2xs text-slate-400 font-bold mb-1 md:hidden">اسم الشفت</span>
+                <input type="text" data-field="name" maxlength="40" value="${escapeHtml(sh.name)}" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </label>
+            <label class="block">
+                <span class="block text-2xs text-slate-400 font-bold mb-1">يبدأ</span>
+                <input type="time" data-field="start" value="${escapeHtml(sh.start)}" oninput="updateShiftRowHours('${sid}')" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
+            </label>
+            <label class="block">
+                <span class="block text-2xs text-slate-400 font-bold mb-1">ينتهي</span>
+                <input type="time" data-field="end" value="${escapeHtml(sh.end)}" oninput="updateShiftRowHours('${sid}')" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
+            </label>
+            <div class="col-span-1">
+                <span class="block text-2xs text-slate-400 font-bold mb-1">عدد الساعات</span>
+                <div class="shift-hours h-[42px] flex flex-col items-center justify-center px-2 bg-indigo-50 border border-indigo-100 rounded-xl font-black text-indigo-700 leading-tight">
+                    <span data-role="hours">${formatShiftDuration(dur)}</span>
+                    <span data-role="overnight" class="text-3xs font-semibold text-indigo-400 ${overnight ? '' : 'hidden'}" style="font-size:.62rem">يمتد لليوم التالي</span>
+                </div>
+            </div>
+            <div class="col-span-1 md:col-span-1 flex items-center gap-2 justify-end">
+                <span class="text-2xs text-slate-400 font-semibold whitespace-nowrap ml-auto md:ml-0">${count} مودريتور</span>
+                <button type="button" onclick="saveShiftRow('${sid}')" class="h-[42px] px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center gap-1.5 transition" title="حفظ التعديلات">
+                    <i data-lucide="check" class="w-4 h-4"></i><span>حفظ</span>
+                </button>
+                <button type="button" onclick="deleteShift('${sid}')" class="h-[42px] w-[42px] flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl transition" title="حذف الشفت">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+}
+
+window.updateNewShiftHours = function() {
+    const st = document.getElementById('newShiftStart').value;
+    const en = document.getElementById('newShiftEnd').value;
+    const box = document.getElementById('newShiftHours');
+    if (!st || !en) { box.textContent = '--'; return; }
+    const d = shiftDurationMinutes(st, en);
+    box.textContent = d === 0 ? 'الوقتان متطابقان' : formatShiftDuration(d);
+};
+
+window.updateShiftRowHours = function(shiftId) {
+    const row = document.querySelector(`.shift-row[data-shift-id="${shiftId}"]`);
+    if (!row) return;
+    const st = row.querySelector('[data-field="start"]').value;
+    const en = row.querySelector('[data-field="end"]').value;
+    const d = shiftDurationMinutes(st, en);
+    row.querySelector('[data-role="hours"]').textContent = d === 0 ? 'الوقتان متطابقان' : formatShiftDuration(d);
+    row.querySelector('[data-role="overnight"]').classList.toggle('hidden', !(d && shiftCrossesMidnight(st, en)));
+};
+
+function validateShiftInput(name, start, end) {
+    if (!name) return 'يرجى كتابة اسم الشفت.';
+    if (!start || !end) return 'يرجى تحديد وقت بداية الشفت ونهايته.';
+    if (shiftDurationMinutes(start, end) === 0) return 'وقت البداية والنهاية متطابقان، اختر وقتين مختلفين.';
+    return null;
+}
+
+function afterShiftsChanged() {
+    renderShiftManager();
+    // تحديث أي قوائم تعتمد على الشفتات
+    if (typeof populateShiftFilter === 'function') populateShiftFilter();
+    if (typeof renderDashboard === 'function') renderDashboard();
+}
+
+window.addShiftFromForm = function(e) {
+    e.preventDefault();
+    const name = document.getElementById('newShiftName').value.trim();
+    const start = document.getElementById('newShiftStart').value;
+    const end = document.getElementById('newShiftEnd').value;
+
+    const err = validateShiftInput(name, start, end);
+    if (err) { Swal.fire({ icon: 'warning', title: 'تنبيه', text: err, confirmButtonColor: '#4f46e5', confirmButtonText: 'حسناً' }); return; }
+
+    DB.data.settings.shifts.push({ id: `shift_${Date.now()}`, name, start, end, icon: 'clock' });
+    DB.save();
+
+    document.getElementById('newShiftName').value = '';
+    document.getElementById('newShiftStart').value = '';
+    document.getElementById('newShiftEnd').value = '';
+    document.getElementById('newShiftHours').textContent = '--';
+    afterShiftsChanged();
+
+    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: `تمت إضافة الشفت "${name}"`, showConfirmButton: false, timer: 1800 });
+};
+
+window.saveShiftRow = function(shiftId) {
+    const row = document.querySelector(`.shift-row[data-shift-id="${shiftId}"]`);
+    const shift = DB.data.settings.shifts.find(x => x.id === shiftId);
+    if (!row || !shift) return;
+
+    const name = row.querySelector('[data-field="name"]').value.trim();
+    const start = row.querySelector('[data-field="start"]').value;
+    const end = row.querySelector('[data-field="end"]').value;
+
+    const err = validateShiftInput(name, start, end);
+    if (err) { Swal.fire({ icon: 'warning', title: 'تنبيه', text: err, confirmButtonColor: '#4f46e5', confirmButtonText: 'حسناً' }); return; }
+
+    shift.name = name;
+    shift.start = start;
+    shift.end = end;
+    DB.save();
+    afterShiftsChanged();
+
+    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'تم حفظ تعديلات الشفت', showConfirmButton: false, timer: 1500 });
+};
+
+window.deleteShift = async function(shiftId) {
+    const shifts = DB.data.settings.shifts;
+    const shift = shifts.find(x => x.id === shiftId);
+    if (!shift) return;
+
+    if (shifts.length <= 1) {
+        Swal.fire({ icon: 'info', title: 'لا يمكن الحذف', text: 'يجب أن يبقى شفت واحد على الأقل في النظام. أضف شفتاً آخر أولاً ثم احذف هذا الشفت.', confirmButtonColor: '#4f46e5', confirmButtonText: 'حسناً' });
+        return;
+    }
+
+    const assigned = DB.getModerators().filter(m => m.shiftId === shiftId);
+    let moveToId = null;
+
+    if (assigned.length > 0) {
+        const options = {};
+        shifts.filter(x => x.id !== shiftId).forEach(x => {
+            options[x.id] = `${x.name} (${x.start} - ${x.end})`;
+        });
+        const res = await Swal.fire({
+            title: `حذف الشفت "${shift.name}"؟`,
+            html: `<div class="text-sm">يوجد <b>${assigned.length}</b> مودريتور على هذا الشفت. اختر الشفت الذي سيُنقلون إليه:</div>`,
+            input: 'select',
+            inputOptions: options,
+            inputValue: Object.keys(options)[0],
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'نقلهم وحذف الشفت',
+            cancelButtonText: 'إلغاء'
+        });
+        if (!res.isConfirmed) return;
+        moveToId = res.value;
+    } else {
+        const res = await Swal.fire({
+            title: `حذف الشفت "${shift.name}"؟`,
+            text: 'لن يتأثر أي مودريتور لأنه لا يوجد أحد على هذا الشفت.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'نعم، احذف',
+            cancelButtonText: 'إلغاء'
+        });
+        if (!res.isConfirmed) return;
+    }
+
+    if (moveToId) assigned.forEach(m => { m.shiftId = moveToId; });
+    DB.data.settings.shifts = shifts.filter(x => x.id !== shiftId);
+    DB.save();
+    afterShiftsChanged();
+
+    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'تم حذف الشفت', showConfirmButton: false, timer: 1500 });
+};
+
 function renderSettings() {
     document.getElementById('settingCompanyName').value = DB.data.settings.companyName;
     document.getElementById('settingCurrency').value = DB.data.settings.currency;
@@ -5120,6 +5951,7 @@ function renderSettings() {
     if (configInput && config) {
         configInput.value = JSON.stringify(config, null, 2);
     }
+    renderShiftManager();
     updateCloudStatusBadge();
 }
 
