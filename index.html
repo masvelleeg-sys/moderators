@@ -31,6 +31,7 @@
     <!-- Firebase Realtime Cloud Sync (Google) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -2257,10 +2258,9 @@ const initialData = {
 
 const FIREBASE_CONFIG_KEY = 'MODERATOR_SYSTEM_FIREBASE_CONFIG';
 
-// إعدادات Firebase الافتراضية (مدمجة في الملف عشان كل الأجهزة تتصل تلقائياً)
-const DEFAULT_FIREBASE_CONFIG = {
-    databaseURL: 'https://moderators-syste-default-rtdb.europe-west1.firebasedatabase.app'
-};
+// لا يوجد إعداد افتراضي مشترك لقاعدة بيانات Firebase — كل نظام لازم يستخدم قاعدة بياناته
+// الخاصة فقط، لتجنب اشتراك أكثر من جهة في نفس قاعدة البيانات وتسريب بيانات الموظفين.
+const DEFAULT_FIREBASE_CONFIG = null;
 
 // فئة إدارة البيانات (DataStore Manager)
 class DataStore {
@@ -2285,41 +2285,66 @@ class DataStore {
         if (typeof window === 'undefined' || typeof firebase === 'undefined') return;
 
         try {
+            // لا يتم الاتصال بأي قاعدة بيانات سحابية إلا إذا قام المدير بإدخالها بنفسه
+            // من تبويب الإعدادات وحفظها صراحةً (لا يوجد اتصال تلقائي بإعداد افتراضي).
             let config = null;
             const savedConfig = localStorage.getItem(FIREBASE_CONFIG_KEY);
             if (savedConfig) {
                 config = JSON.parse(savedConfig);
             } else {
-                config = DEFAULT_FIREBASE_CONFIG;
+                config = DEFAULT_FIREBASE_CONFIG; // null دائمًا ما لم يحفظ المدير إعداداته الخاصة
             }
 
             if (config && config.databaseURL) {
                 if (!firebase.apps.length) {
                     firebase.initializeApp(config);
                 }
-                this.fbDb = firebase.database();
-                this.fbRef = this.fbDb.ref('moderator_data');
 
-                // الاستماع للتحديثات اللحظية من السحابة (Realtime WebSockets)
-                this.fbRef.on('value', snapshot => {
-                    const cloudData = snapshot.val();
-                    if (cloudData && (cloudData.settings || cloudData.pages || cloudData.moderators)) {
-                        this.data = { ...initialData, ...cloudData };
-                        this.saveLocal(this.data);
-                        this.cloudConnected = true;
-                        window.dispatchEvent(new CustomEvent('db-synced', { detail: this.data }));
-                        window.dispatchEvent(new CustomEvent('cloud-status', { detail: { connected: true } }));
-                    } else {
-                        // رفع البيانات الأولية إلى السحابة لأول مرة
-                        this.fbRef.set(this.data);
-                        this.cloudConnected = true;
-                        window.dispatchEvent(new CustomEvent('cloud-status', { detail: { connected: true } }));
-                    }
-                }, err => {
-                    console.log('Cloud sync notice:', err.message);
-                    this.cloudConnected = false;
-                    window.dispatchEvent(new CustomEvent('cloud-status', { detail: { connected: false, error: err.message } }));
-                });
+                const attachRealtimeListener = () => {
+                    this.fbDb = firebase.database();
+                    this.fbRef = this.fbDb.ref('moderator_data');
+
+                    // الاستماع للتحديثات اللحظية من السحابة (Realtime WebSockets)
+                    this.fbRef.on('value', snapshot => {
+                        const cloudData = snapshot.val();
+                        if (cloudData && (cloudData.settings || cloudData.pages || cloudData.moderators)) {
+                            this.data = { ...initialData, ...cloudData };
+                            this.saveLocal(this.data);
+                            this.cloudConnected = true;
+                            window.dispatchEvent(new CustomEvent('db-synced', { detail: this.data }));
+                            window.dispatchEvent(new CustomEvent('cloud-status', { detail: { connected: true } }));
+                        } else {
+                            // رفع البيانات الأولية إلى السحابة لأول مرة
+                            this.fbRef.set(this.data);
+                            this.cloudConnected = true;
+                            window.dispatchEvent(new CustomEvent('cloud-status', { detail: { connected: true } }));
+                        }
+                    }, err => {
+                        console.log('Cloud sync notice:', err.message);
+                        this.cloudConnected = false;
+                        window.dispatchEvent(new CustomEvent('cloud-status', { detail: { connected: false, error: err.message } }));
+                    });
+                };
+
+                // نسجّل دخول مجهول (Anonymous Auth) قبل الاتصال بقاعدة البيانات، عشان
+                // قواعد حماية Firebase تقدر تشترط "auth != null" بدل ما تكون مفتوحة للجميع
+                // (Test Mode). لو مكتبة Auth مش متاحة لأي سبب، نتصل مباشرة كحل احتياطي.
+                if (firebase.auth) {
+                    firebase.auth().signInAnonymously()
+                        .then(() => attachRealtimeListener())
+                        .catch(err => {
+                            console.log('Cloud auth notice:', err.message);
+                            this.cloudConnected = false;
+                            window.dispatchEvent(new CustomEvent('cloud-status', {
+                                detail: {
+                                    connected: false,
+                                    error: 'تحتاج تفعيل "Anonymous" في Authentication من Firebase Console — ' + err.message
+                                }
+                            }));
+                        });
+                } else {
+                    attachRealtimeListener();
+                }
             }
         } catch (e) {
             console.log('Firebase init notice:', e.message);
@@ -2648,6 +2673,30 @@ function isAdminAuthenticated() {
            sessionStorage.getItem(AUTH_STORAGE_KEY) === 'true';
 }
 
+// حماية تسجيل دخول الأدمن من محاولات التخمين المتكررة (Brute-force protection)
+const ADMIN_LOGIN_MAX_ATTEMPTS = 5;
+const ADMIN_LOGIN_LOCK_MS = 60000; // دقيقة واحدة
+const ADMIN_LOGIN_ATTEMPTS_KEY = 'MODERATOR_ADMIN_LOGIN_ATTEMPTS';
+
+function getAdminLoginLockState() {
+    try {
+        const raw = sessionStorage.getItem(ADMIN_LOGIN_ATTEMPTS_KEY);
+        return raw ? JSON.parse(raw) : { count: 0, lockUntil: 0 };
+    } catch (e) {
+        return { count: 0, lockUntil: 0 };
+    }
+}
+
+function setAdminLoginLockState(state) {
+    sessionStorage.setItem(ADMIN_LOGIN_ATTEMPTS_KEY, JSON.stringify(state));
+}
+
+function getAdminLoginLockRemaining() {
+    const st = getAdminLoginLockState();
+    const remaining = st.lockUntil - Date.now();
+    return remaining > 0 ? remaining : 0;
+}
+
 // معالجة تسجيل الدخول للوحة التحكم
 window.handleAdminLogin = function(event) {
     if (event) event.preventDefault();
@@ -2655,6 +2704,15 @@ window.handleAdminLogin = function(event) {
     const passEl = document.getElementById('loginPassword');
     const rememberEl = document.getElementById('loginRememberMe');
     const errEl = document.getElementById('loginErrorAlert');
+
+    const lockRemaining = getAdminLoginLockRemaining();
+    if (lockRemaining > 0) {
+        if (errEl) {
+            errEl.classList.remove('hidden');
+            errEl.textContent = `تم قفل تسجيل الدخول مؤقتاً بسبب محاولات خاطئة كثيرة، حاول بعد ${Math.ceil(lockRemaining / 1000)} ثانية`;
+        }
+        return;
+    }
 
     const username = userEl ? userEl.value.trim() : '';
     const password = passEl ? passEl.value.trim() : '';
@@ -2665,6 +2723,7 @@ window.handleAdminLogin = function(event) {
     const storedPass = (DB.data && DB.data.settings && DB.data.settings.adminPassword) ? DB.data.settings.adminPassword : 'admin123';
 
     if (username === storedUser && password === storedPass) {
+        setAdminLoginLockState({ count: 0, lockUntil: 0 });
         if (remember) {
             localStorage.setItem(AUTH_STORAGE_KEY, 'true');
         } else {
@@ -2683,9 +2742,20 @@ window.handleAdminLogin = function(event) {
 
         showView('admin');
     } else {
+        const st = getAdminLoginLockState();
+        st.count = (st.count || 0) + 1;
+        if (st.count >= ADMIN_LOGIN_MAX_ATTEMPTS) {
+            st.lockUntil = Date.now() + ADMIN_LOGIN_LOCK_MS;
+            st.count = 0;
+        }
+        setAdminLoginLockState(st);
+
         if (errEl) {
             errEl.classList.remove('hidden');
-            errEl.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة، يرجى التأكد والمحاولة مجدداً.';
+            const remaining = getAdminLoginLockRemaining();
+            errEl.textContent = remaining > 0
+                ? `تم قفل تسجيل الدخول مؤقتاً بسبب محاولات خاطئة كثيرة، حاول بعد ${Math.ceil(remaining / 1000)} ثانية`
+                : 'اسم المستخدم أو كلمة المرور غير صحيحة، يرجى التأكد والمحاولة مجدداً.';
         }
         const card = document.getElementById('loginCard');
         if (card) {
@@ -2721,16 +2791,6 @@ window.handleAdminLogout = function() {
             });
         }
     });
-};
-
-// ملء البيانات الافتراضية بنقرة واحدة
-window.fillDemoCredentials = function() {
-    const userEl = document.getElementById('loginUsername');
-    const passEl = document.getElementById('loginPassword');
-    const storedUser = (DB.data && DB.data.settings && DB.data.settings.adminUsername) ? DB.data.settings.adminUsername : 'admin';
-    const storedPass = (DB.data && DB.data.settings && DB.data.settings.adminPassword) ? DB.data.settings.adminPassword : 'admin123';
-    if (userEl) userEl.value = storedUser;
-    if (passEl) passEl.value = storedPass;
 };
 
 // إظهار وإخفاء كلمة المرور
@@ -2907,6 +2967,34 @@ let selectedModId = null;
 let verifiedModPinId = null;
 let currentTab = 'history';
 
+// حماية من محاولات تخمين كود الـ PIN (Brute-force protection)
+// بعد عدد معين من المحاولات الخاطئة، يتم قفل إدخال الكود مؤقتاً لهذا المودريتور
+const PIN_MAX_ATTEMPTS = 5;
+const PIN_LOCK_MS = 60000; // دقيقة واحدة
+const pinAttemptsState = {}; // { [modId]: { count, lockUntil } }
+
+function getPinLockRemaining(modId) {
+    const st = pinAttemptsState[modId];
+    if (!st || !st.lockUntil) return 0;
+    const remaining = st.lockUntil - Date.now();
+    return remaining > 0 ? remaining : 0;
+}
+
+function registerFailedPinAttempt(modId) {
+    if (!pinAttemptsState[modId]) pinAttemptsState[modId] = { count: 0, lockUntil: 0 };
+    const st = pinAttemptsState[modId];
+    st.count += 1;
+    if (st.count >= PIN_MAX_ATTEMPTS) {
+        st.lockUntil = Date.now() + PIN_LOCK_MS;
+        st.count = 0;
+    }
+    return st;
+}
+
+function clearPinAttempts(modId) {
+    delete pinAttemptsState[modId];
+}
+
 window.initCheckInPortal = function(forcedModId = null) {
     if (typeof updateLiveClock === 'function') updateLiveClock();
 
@@ -2959,9 +3047,39 @@ function promptForModeratorPin() {
         renderSelectedModerator();
     } else {
         if (pinLock) pinLock.style.display = 'block';
-        if (pinInput) {
+        applyPinLockUIState(selectedModId);
+        if (pinInput && !pinInput.disabled) {
             pinInput.value = '';
             pinInput.focus();
+        }
+    }
+}
+
+// تحديث واجهة القفل المؤقت لكود الـ PIN حسب حالة المحاولات
+function applyPinLockUIState(modId) {
+    const pinInput = document.getElementById('checkinPinInput');
+    const err = document.getElementById('pinErrorMsg');
+    const remaining = getPinLockRemaining(modId);
+
+    if (remaining > 0) {
+        if (pinInput) {
+            pinInput.disabled = true;
+            pinInput.value = '';
+        }
+        if (err) {
+            err.classList.remove('hidden');
+            err.dataset.lockMsg = '1';
+            const seconds = Math.ceil(remaining / 1000);
+            err.textContent = `تم قفل إدخال الكود مؤقتاً بسبب محاولات خاطئة كثيرة، حاول بعد ${seconds} ثانية`;
+        }
+        clearTimeout(window._pinLockTimer);
+        window._pinLockTimer = setTimeout(() => applyPinLockUIState(modId), 1000);
+    } else {
+        if (pinInput) pinInput.disabled = false;
+        if (err && err.dataset.lockMsg === '1') {
+            err.classList.add('hidden');
+            err.textContent = '❌ الكود غير صحيح، يرجى إعادة المحاولة!';
+            delete err.dataset.lockMsg;
         }
     }
 }
@@ -2972,6 +3090,12 @@ window.verifyModeratorPin = function() {
     const mod = DB.getModerator(selectedModId);
     if (!mod) return;
 
+    // امنع أي محاولة تحقق أثناء فترة القفل المؤقت
+    if (getPinLockRemaining(selectedModId) > 0) {
+        applyPinLockUIState(selectedModId);
+        return;
+    }
+
     const input = document.getElementById('checkinPinInput');
     const err = document.getElementById('pinErrorMsg');
     const enteredPin = input ? input.value.trim() : '';
@@ -2979,6 +3103,7 @@ window.verifyModeratorPin = function() {
     const expectedPin = mod.pinCode || '0000';
 
     if (enteredPin === expectedPin) {
+        clearPinAttempts(selectedModId);
         verifiedModPinId = selectedModId;
         if (err) err.classList.add('hidden');
         document.getElementById('pinLockSection').style.display = 'none';
@@ -2993,6 +3118,11 @@ window.verifyModeratorPin = function() {
             timer: 1500
         });
     } else {
+        registerFailedPinAttempt(selectedModId);
+        if (getPinLockRemaining(selectedModId) > 0) {
+            applyPinLockUIState(selectedModId);
+            return;
+        }
         if (err) err.classList.remove('hidden');
         if (input) {
             input.value = '';
@@ -5879,24 +6009,37 @@ window.testAndSyncCloud = function() {
 
 window.showFirebaseSetupGuide = function() {
     Swal.fire({
-        title: '☁️ تفعيل قاعدة بيانات سحابية مجانية في دقيقة واحدة',
+        title: '☁️ تفعيل قاعدة بيانات سحابية آمنة ومجانية',
         html: `
             <div class="text-right text-xs text-slate-700 space-y-3 leading-relaxed">
-                <p>لجعل النظام يعمل أونلاين في أي مكان ومزامنته مع كافة الهواتف مجاناً 100% عبر Google Firebase:</p>
+                <p>لجعل النظام يعمل أونلاين في أي مكان ومزامنته مع كافة الهواتف مجاناً 100% عبر Google Firebase، وبشكل آمن (مش مفتوح للعالم كله):</p>
                 <ol class="list-decimal list-inside space-y-2 font-medium bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <li>ادخل على موقع <a href="https://console.firebase.google.com" target="_blank" class="text-indigo-600 font-bold underline">Firebase Console</a> بحساب Google الخاص بك.</li>
-                    <li>اضغط على <b>Add Project</b> وأنشئ مشروعاً مجانياً باسم <code>moderator-system</code>.</li>
-                    <li>من القائمة الجانبية اختر <b>Build</b> ثم <b>Realtime Database</b> واضغط <b>Create Database</b>.</li>
-                    <li>في خطوة الأمان (Security Rules) اختر <b>Start in test mode</b> (أو Test Mode).</li>
-                    <li>انسخ رابط قاعدة البيانات الظاهر في الأعلى (مثال: <code>https://your-app-rtdb.firebaseio.com/</code>) والصقه في خانة الإعدادات هنا!</li>
+                    <li>ادخل على موقع <a href="https://console.firebase.google.com" target="_blank" class="text-indigo-600 font-bold underline">Firebase Console</a> بحساب Google الخاص بك، واعمل مشروعاً مجانياً جديداً.</li>
+                    <li>من القائمة الجانبية اختر <b>Build</b> ثم <b>Realtime Database</b> → <b>Create Database</b>.</li>
+                    <li>في خطوة الأمان اختر أي وضع مبدئياً (هنظبطه صح في الخطوة 5).</li>
+                    <li>من القائمة الجانبية اختر <b>Build</b> ثم <b>Authentication</b> → تبويب <b>Sign-in method</b> → فعّل خيار <b>Anonymous</b> فقط (زرار Enable ثم Save). ده بيخلي النظام بس هو اللي يقدر يوصل للبيانات.</li>
+                    <li>ارجع لـ <b>Realtime Database</b> → تبويب <b>Rules</b>، وامسح اللي موجود، والصق بدالها بالظبط:
+                        <pre class="bg-slate-900 text-emerald-300 p-2 rounded-lg text-[10px] mt-1 text-left" dir="ltr">{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
+}</pre>
+                        ثم اضغط <b>Publish</b>.
+                    </li>
+                    <li>ارجع لصفحة <b>Project settings</b> (⚙️) → انسخ رابط قاعدة البيانات (Database URL، شكله <code>https://your-app-default-rtdb.firebaseio.com</code>) والصقه في خانة الإعدادات هنا واضغط حفظ.</li>
                 </ol>
                 <div class="p-2.5 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200 font-bold text-center">
-                    مبروك! سيصبح نظامك سحابياً بالكامل ويعمل عبر أي هاتف أو متصفح في العالم فوراً! 🎉
+                    مبروك! نظامك بقى سحابي وآمن، وبياناتك متاحة بس من جوه النظام نفسه — مش لأي حد يعرف الرابط. 🎉
+                </div>
+                <div class="p-2.5 bg-amber-50 text-amber-800 rounded-xl border border-amber-200 text-[11px]">
+                    ⚠️ متستخدمش وضع "Test Mode" في قواعد الحماية — بيسمح لأي حد في الإنترنت يقرا ويعدّل بيانات الموظفين، وبيتوقف تلقائيًا بعد 30 يوم.
                 </div>
             </div>
         `,
         confirmButtonColor: '#4f46e5',
-        confirmButtonText: 'فهمت، شكراً لك'
+        confirmButtonText: 'فهمت، شكراً لك',
+        width: 480
     });
 };
 
